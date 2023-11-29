@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Match } from '../../types';
-	import Dropdown from '../../components/General/Dropdown.svelte';
+	import Dropdown from '../General/Dropdown.svelte';
 	let showDropdown = false;
 
 	export let admin = true;

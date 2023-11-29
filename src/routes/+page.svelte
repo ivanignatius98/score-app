@@ -1,18 +1,34 @@
-<script>
+<script lang="ts">
 	import SlideOver from '../components/General/SlideOver.svelte';
-	import MatchItem from './matches/MatchItem.svelte';
+	import MatchItem from '../components/Matches/MatchItem.svelte';
+	import { navbarStore } from '../stores/navbar.js';
+	import type { Match } from '../types';
 
 	export let data;
-	$: ({ record } = data);
+	$: ({ record } = data as { record: Match[] });
 	let showSidePanel = false;
 	let admin = false;
+
+	function initNavbar() {
+		navbarStore.update(() => {
+			return {
+				title: 'Matches',
+				buttonAction: () => {
+					showSidePanel = true;
+				}
+			};
+		});
+	}
+	initNavbar();
 </script>
 
 <div class="flow-root mt-6">
 	<ul role="list" class="-my-5 divide-y divide-gray-800">
 		{#each record as match}
 			<li>
-				<MatchItem bind:match bind:admin />
+				{#if match}
+					<MatchItem bind:match bind:admin />
+				{/if}
 			</li>
 		{/each}
 	</ul>
