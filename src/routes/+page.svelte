@@ -1,34 +1,30 @@
 <script>
-	const colors = ['red', 'orange', 'yellow'];
+	import SlideOver from '../components/General/SlideOver.svelte';
+	import MatchItem from './matches/MatchItem.svelte';
 
-	let active = '';
+	export let data;
+	$: ({ record } = data);
+	let showSidePanel = false;
+	let admin = false;
 </script>
 
-<div class="my-4">
-	<label for="shot-type">Shot</label>
-	<div id="shot-type" class="grid grid-cols-3 gap-4 mt-2">
-		{#each colors as color}
-			<button
-				class={`${
-					active == color ? 'ring-2 ring-green-400' : ''
-				} rounded-md p-2 bg-gray-700 md:hover:bg-gray-600`}
-				aria-current={active === color}
-				aria-label={color}
-				class:active={active == color}
-				on:click={() => (active = active == color ? '' : color)}
-				>{color}
-			</button>
+<div class="flow-root mt-6">
+	<ul role="list" class="-my-5 divide-y divide-gray-800">
+		{#each record as match}
+			<li>
+				<MatchItem bind:match bind:admin />
+			</li>
 		{/each}
-	</div>
+	</ul>
 </div>
-<div class="flex gap-4">
-	<button class="flex-1 mt-4 rounded-md shadow-lg font-bold bg-red-600 min-h-[4.8rem]">
-		NOP
-	</button>
-	<button class="flex-1 mt-4 rounded-md shadow-lg font-bold bg-emerald-600 min-h-[4.8rem]">
-		MAKE
+<div class="mt-6">
+	<button
+		type="button"
+		class="w-full flex justify-center items-center px-4 py-2 shadow-sm text-sm font-medium rounded-md text-white bg-white bg-opacity-10 hover:bg-opacity-20"
+	>
+		View all
 	</button>
 </div>
+<button class="p-3" on:click={() => (showSidePanel = true)}> Show side panel </button>
 
-<style>
-</style>
+<SlideOver bind:showSidePanel></SlideOver>
