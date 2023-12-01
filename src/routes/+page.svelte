@@ -41,20 +41,20 @@
 	};
 
 	const avatarColors = new Set([
-		'bg-red-500',
-		'bg-blue-500',
-		'bg-green-500',
-		'bg-yellow-500',
-		'bg-pink-500',
-		'bg-purple-500',
-		'bg-indigo-500',
-		'bg-teal-500',
-		'bg-orange-500',
-		'bg-cyan-500',
-		'bg-gray-500',
-		'bg-lime-500',
-		'bg-emerald-500',
-		'bg-fuchsia-500'
+		'red',
+		'blue',
+		'green',
+		'yellow',
+		'pink',
+		'purple',
+		'indigo',
+		'teal',
+		'orange',
+		'cyan',
+		'gray',
+		'lime',
+		'emerald',
+		'fuchsia'
 	]);
 	let currColors = new Set<string>([]);
 	const handleAddTeam = (team: any, person: any) => {
@@ -165,18 +165,19 @@
 					<div class="mt-2">
 						<div class="flex gap-1">
 							{#each teamA as person}
-								{#if person}
+								<button class="group" on:click={() => handleAddTeam('a', person)} type="button">
 									<span
 										class={classNames(
-											person.color,
+											`bg-${person.color}-500 group-hover:bg-${person.color}-600`,
 											'inline-flex items-center justify-center h-8 w-8 rounded-full'
 										)}
 									>
-										<span class="text-sm font-medium leading-none text-white"
+										<span
+											class="text-sm font-medium leading-none text-white group-hover:text-gray-300"
 											>{person?.initials}</span
 										>
 									</span>
-								{/if}
+								</button>
 							{/each}
 							<button
 								on:click={() => (openModal = true)}
@@ -195,9 +196,8 @@
 									></path></svg
 								>
 							</button>
-
 							<Modal title="Edit your details" bind:openModal>
-								<div class="overflow-y-auto" slot="content">
+								<div class="overflow-y-auto overflow-x-hidden max-h-64" slot="content">
 									<ul role="list" class="-my-4 text-sm py-8">
 										{#each players as person}
 											<li class="py-3 px-8 rounded-md">
@@ -239,18 +239,19 @@
 					<div class="mt-2">
 						<div class="flex gap-1">
 							{#each teamB as person}
-								{#if person}
+								<button class="group" on:click={() => handleAddTeam('b', person)} type="button">
 									<span
 										class={classNames(
-											person.color,
+											`bg-${person.color}-500 group-hover:bg-${person.color}-600`,
 											'inline-flex items-center justify-center h-8 w-8 rounded-full'
 										)}
 									>
-										<span class="text-sm font-medium leading-none text-white"
+										<span
+											class="text-sm font-medium leading-none text-white group-hover:text-gray-300"
 											>{person?.initials}</span
 										>
 									</span>
-								{/if}
+								</button>
 							{/each}
 							<button
 								on:click={() => (openModal = true)}

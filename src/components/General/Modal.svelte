@@ -1,4 +1,6 @@
 <script>
+	import { clickOutside } from "../../helpers/click_outside";
+
 	export let openModal = false;
 	export let title = '';
 	export let description = '';
@@ -7,7 +9,11 @@
 {#if openModal}
 	<div class="z-50 fixed w-full h-full top-0 left-0 flex items-center justify-center">
 		<div class="fixed w-full h-full bg-gray-900 opacity-50"></div>
-		<div class="bg-gray-800 w-full max-w-md mx-auto rounded-md shadow-xl z-50">
+		<div
+			class="bg-gray-800 w-full max-w-md rounded-md shadow-xl z-50"
+			use:clickOutside
+			on:outclick={() => (openModal = false)}
+		>
 			<div class="px-4 sm:px-6 py-6 shadow-xl">
 				<div class="flex items-start justify-between">
 					<h2 class="text-md font-medium text-white">{title}</h2>
