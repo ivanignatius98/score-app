@@ -26,10 +26,16 @@
 		return classes.filter(Boolean).join(' ');
 	};
 
+	interface TeamItem extends Player {
+		initials: string;
+		color: string;
+		colorClass: string;
+	}
+
 	let openModal = false;
-	let teamA: (Player & { initials: string; color: string })[] = [];
+	let teamA: TeamItem[] = [];
 	let teamAIds: Set<string> = new Set();
-	let teamB: (Player & { initials: string; color: string })[] = [];
+	let teamB: TeamItem[] = [];
 	let teamBIds: Set<string> = new Set();
 	const getInitials = (name: string) => {
 		const initials = name
@@ -57,7 +63,7 @@
 		'fuchsia'
 	]);
 	let currColors = new Set<string>([]);
-	const handleAddTeam = (team: any, person: any) => {
+	const handleAddTeam = (team: string, person: Player) => {
 		const getColor = () => {
 			let availableColors = new Set([...avatarColors]);
 			for (const element of currColors) {
@@ -90,14 +96,19 @@
 			const foundIndex = arr1.findIndex((obj) => obj._id === person._id);
 			if (foundIndex !== -1) {
 				const temp = [...arr1];
-				temp.splice(foundIndex, 1);
+				const [deleted] = temp.splice(foundIndex, 1);
 				arr1 = temp;
 				set1 = new Set([...set1]);
+				currColors.delete(deleted.color);
+				currColors = new Set([...currColors]);
 			}
 		} else {
 			if (arr1.length < 5) {
 				set1 = new Set([...set1, stringId]);
-				arr1 = [...arr1, { ...person, initials, color }];
+				arr1 = [
+					...arr1,
+					{ ...person, initials, color, colorClass: `bg-${color}-500 group-hover:bg-${color}-700` }
+				];
 			}
 		}
 
@@ -106,9 +117,11 @@
 			const foundIndex = arr2.findIndex((obj) => obj._id === person._id);
 			if (foundIndex !== -1) {
 				const temp = [...arr2];
-				temp.splice(foundIndex, 1);
+				const [deleted] = temp.splice(foundIndex, 1);
 				arr2 = temp;
 				set2 = new Set([...set2]);
+				currColors.delete(deleted.color);
+				currColors = new Set([...currColors]);
 			}
 		}
 
@@ -168,7 +181,7 @@
 								<button class="group" on:click={() => handleAddTeam('a', person)} type="button">
 									<span
 										class={classNames(
-											`bg-${person.color}-500 group-hover:bg-${person.color}-600`,
+											person.colorClass,
 											'inline-flex items-center justify-center h-8 w-8 rounded-full'
 										)}
 									>
@@ -242,7 +255,7 @@
 								<button class="group" on:click={() => handleAddTeam('b', person)} type="button">
 									<span
 										class={classNames(
-											`bg-${person.color}-500 group-hover:bg-${person.color}-600`,
+											person.colorClass,
 											'inline-flex items-center justify-center h-8 w-8 rounded-full'
 										)}
 									>
