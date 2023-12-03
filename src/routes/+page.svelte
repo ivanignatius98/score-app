@@ -3,7 +3,9 @@
 	import SlideOver from '../components/General/SlideOver.svelte';
 	import MatchItem from '../components/Matches/MatchItem.svelte';
 	import { navbarStore } from '../stores/navbar.js';
+	import { seriesStore } from '../stores/series.js';
 	import type { Match, Player } from '../types';
+	import { page } from '$app/stores';
 
 	export let data;
 	$: ({ record, players } = data as { record: Match[]; players: Player[] });
@@ -17,6 +19,11 @@
 				buttonAction: () => {
 					showSidePanel = true;
 				}
+			};
+		});
+		seriesStore.update(() => {
+			return {
+				matches: ['Matches']
 			};
 		});
 	}

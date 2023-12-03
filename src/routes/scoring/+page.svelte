@@ -1,7 +1,15 @@
 <script>
+	import { seriesStore } from '../../stores/series';
+
 	const colors = ['red', 'orange', 'yellow'];
 
 	let active = '';
+
+	let navValue = { matches: [''] };
+
+	const unsubscribe = seriesStore.subscribe((value) => {
+		navValue = value;
+	});
 </script>
 
 <div class="my-4">
