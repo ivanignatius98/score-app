@@ -1,4 +1,4 @@
-import type { Document, Types } from 'mongoose';
+import type { Types } from 'mongoose';
 
 export interface Player {
   _id: Types.ObjectId;
@@ -10,12 +10,12 @@ export interface MatchTeam {
   score: number;
 }
 
-export interface Match extends Document {
+export interface Match {
   name: string;
-  status: 'live' | 'archived' | 'upcoming';
+  status: string;
   aTeam: MatchTeam;
   bTeam: MatchTeam;
-  highlighted: boolean;
+  highlighted?: boolean;
   createdBy: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;

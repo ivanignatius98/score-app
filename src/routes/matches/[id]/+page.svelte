@@ -1,14 +1,21 @@
 <script lang="ts">
-	import Modal from '../components/General/Modal.svelte';
-	import SlideOver from '../components/General/SlideOver.svelte';
-	import MatchItem from '../components/Matches/MatchItem.svelte';
-	import { navbarStore } from '../stores/navbar.js';
-	import { seriesStore } from '../stores/series.js';
-	import type { Match, Player } from '../types';
+	import { enhance } from '$app/forms';
+	import Modal from '../../../components/General/Modal.svelte';
+	import SlideOver from '../../../components/General/SlideOver.svelte';
+	import MatchItem from '../../../components/Matches/MatchItem.svelte';
+	import { navbarStore } from '../../../stores/navbar.js';
+	import { seriesStore } from '../../../stores/series.js';
+	import type { Match, Player } from '../../../types';
+	import { Types } from 'mongoose';
+	type MatchStatus = 'upcoming' | 'live' | 'archived';
 
 	export let data;
-	$: ({ matches = [], players } = data as { matches: Match[]; players: Player[] });
-	let showSidePanel = true;
+	// $: ({ matches = [], players } = data as { matches: Match[]; players: Player[] });
+	// $: matches = (data.matches || []).slice();
+	// $: players = data.players || [];
+	let matches: Match[] = [];
+	let players: Player[] = [];
+	let showSidePanel = false;
 	let admin = false;
 	function initNavbar() {
 		navbarStore.update(() => {
@@ -24,9 +31,10 @@
 		// 		matches: ['Matches']
 		// 	};
 		// });
+		matches = data.matches || [];
+		players = data.players || [];
 	}
 	initNavbar();
-
 	//#region teamhandling
 	const classNames = (...classes: string[]) => {
 		return classes.filter(Boolean).join(' ');
@@ -34,8 +42,6 @@
 
 	interface TeamItem extends Player {
 		initials: string;
-		color: string;
-		colorClass: string;
 	}
 
 	let openModal = false;
@@ -52,44 +58,9 @@
 		return initials;
 	};
 
-	const avatarColors = new Set([
-		'red',
-		'blue',
-		'green',
-		'yellow',
-		'pink',
-		'purple',
-		'indigo',
-		'teal',
-		'orange',
-		'cyan',
-		'gray',
-		'lime',
-		'emerald',
-		'fuchsia'
-	]);
-	let currColors = new Set<string>([]);
-	const handleAddTeam = (team: string, person: Player) => {
-		const getColor = () => {
-			let availableColors = new Set([...avatarColors]);
-			for (const element of currColors) {
-				if (avatarColors.has(element)) {
-					availableColors.delete(element);
-				}
-			}
-
-			const arr = Array.from(availableColors);
-			// Get a random index
-			const randomIndex = Math.floor(Math.random() * arr.length);
-
-			// Get the random element
-			const randomElement = arr[randomIndex];
-			currColors.add(randomElement);
-			return randomElement;
-		};
+	const handleAddTeam = async (team: string, person: Player) => {
 		const stringId = String(person._id);
 		const initials = getInitials(person.name);
-		const color = getColor();
 
 		let [arr1, set1, arr2, set2] =
 			team === 'a' ? [teamA, teamAIds, teamB, teamBIds] : [teamB, teamBIds, teamA, teamAIds];
@@ -105,16 +76,11 @@
 				const [deleted] = temp.splice(foundIndex, 1);
 				arr1 = temp;
 				set1 = new Set([...set1]);
-				currColors.delete(deleted.color);
-				currColors = new Set([...currColors]);
 			}
 		} else {
 			if (arr1.length < 5) {
 				set1 = new Set([...set1, stringId]);
-				arr1 = [
-					...arr1,
-					{ ...person, initials, color, colorClass: `bg-${color}-500 group-hover:bg-${color}-700` }
-				];
+				arr1 = [...arr1, { ...person, initials }];
 			}
 		}
 
@@ -126,20 +92,18 @@
 				const [deleted] = temp.splice(foundIndex, 1);
 				arr2 = temp;
 				set2 = new Set([...set2]);
-				currColors.delete(deleted.color);
-				currColors = new Set([...currColors]);
 			}
 		}
 
 		if (team == 'a') {
-			teamA = arr1;
+			teamA = [...arr1];
 			teamAIds = set1;
-			teamB = arr2;
+			teamB = [...arr2];
 			teamBIds = set2;
 		} else if (team == 'b') {
-			teamB = arr1;
+			teamB = [...arr1];
 			teamBIds = set1;
-			teamA = arr2;
+			teamA = [...arr2];
 			teamAIds = set2;
 		}
 	};
@@ -167,14 +131,47 @@
 </div>
 
 <SlideOver bind:showSidePanel title="Create New Match">
-	<form action="" slot="content" class="flex flex-1 flex-col justify-between h-full">
+	<form
+		method="post"
+		action="?/create"
+		use:enhance={({ formData, formElement }) => {
+			// Before form submission to server
+			// Optimistic UI
+			const name = String(formData.get('name'));
+			const aIds = [...teamAIds].map((row) => new Types.ObjectId(row));
+			const bIds = [...teamBIds].map((row) => new Types.ObjectId(row));
+			const newMatch = {
+				name,
+				status: 'upcoming',
+				aTeam: { players: aIds, score: 0 },
+				bTeam: { players: bIds, score: 0 },
+				createdBy: new Types.ObjectId('6565fcf005ac129c4a659284'),
+				createdAt: new Date(),
+				updatedAt: new Date()
+			};
+
+			matches = [newMatch, ...matches];
+			formData.append('data', JSON.stringify(newMatch));
+			// return async ({ update, result }) => {
+			// 	// 	// After form submission to server
+			// 	// 	const currentTodos = await getCurrentTodos();
+			// 	// 	// change todos to currentTodos from server
+			// 	// 	todos = currentTodos;
+			// 	// 	console.log('1.update todos with the right id from mongodb', todos);
+			// 	// 	isLoading = false;
+			// 	await update();
+			// };
+		}}
+		slot="content"
+		class="flex flex-1 flex-col justify-between h-full"
+	>
 		<div class="divide-y divide-gray-200 px-4 sm:px-6">
 			<div class="space-y-6">
 				<div>
 					<label for="name" class="block mb-2 text-sm text-white">First name</label>
 					<input
 						type="text"
-						id="name"
+						name="name"
 						class="border text-sm rounded-md block w-full py-2 px-3 bg-gray-800 border-gray-600 placeholder-gray-500 focus:border-indigo-500 text-gray-500"
 						placeholder="Match 1"
 						required
@@ -187,10 +184,7 @@
 							{#each teamA as person}
 								<button class="group" on:click={() => handleAddTeam('a', person)} type="button">
 									<span
-										class={classNames(
-											person.colorClass,
-											'inline-flex items-center justify-center h-8 w-8 rounded-full'
-										)}
+										class="bg-blue-500 group-hover:bg-blue-700 inline-flex items-center justify-center h-8 w-8 rounded-full"
 									>
 										<span
 											class="text-sm font-medium leading-none text-white group-hover:text-gray-300"
@@ -261,10 +255,7 @@
 							{#each teamB as person}
 								<button class="group" on:click={() => handleAddTeam('b', person)} type="button">
 									<span
-										class={classNames(
-											person.colorClass,
-											'inline-flex items-center justify-center h-8 w-8 rounded-full'
-										)}
+										class="bg-red-500 group-hover:bg-red-700 inline-flex items-center justify-center h-8 w-8 rounded-full"
 									>
 										<span
 											class="text-sm font-medium leading-none text-white group-hover:text-gray-300"
