@@ -1,9 +1,11 @@
 <script>
 	import '../app.css';
+	import Navbar from './Navbar.svelte';
 </script>
 
 <div class="app bg-gray-900 text-white">
 	<main>
+		<Navbar />
 		<slot />
 	</main>
 </div>

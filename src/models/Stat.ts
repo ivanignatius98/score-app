@@ -22,4 +22,4 @@ const StatSchema = new mongoose.Schema({
   timestamps: true
 });
 
-export const Stat = mongoose.model('stats', StatSchema);
+export const Stat = mongoose.model('Stat', StatSchema);

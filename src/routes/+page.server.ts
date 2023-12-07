@@ -1,10 +1,16 @@
-import { Match } from "../models/Match";
+import { Series } from "../models/Series";
+import { User } from "../models/User";
 import type { Load } from '@sveltejs/kit';
 
 export const load: Load = async () => {
-  let record = await Match.find({}).lean();
-  record = JSON.parse(JSON.stringify(record));
+  let series = await Series.findOne({ _id: '656c6b43d4edeb643612d207' }).lean();
+
+  if (!series) {
+    return { matches: [], players: [] }
+  }
+  const { matches, players } = JSON.parse(JSON.stringify(series));
   return {
-    record,
+    matches,
+    players
   };
 };
