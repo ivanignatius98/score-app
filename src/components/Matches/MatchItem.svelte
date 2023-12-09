@@ -1,4 +1,8 @@
 <script lang="ts">
+	import { createEventDispatcher } from 'svelte';
+
+	const dispatch = createEventDispatcher();
+
 	import type { Match } from '../../types';
 	import Dropdown from '../General/Dropdown.svelte';
 	let showDropdown = false;
@@ -10,7 +14,7 @@
 {#if match != null}
 	<div class="flex items-center space-x-4 relative p-4 rounded-md" class:hover:bg-gray-800={!admin}>
 		{#if !admin}
-			<button type="button" on:click={() => console.log('TEST')}>
+			<button type="button" on:click={() => dispatch('itemClicked', match)}>
 				<span class="absolute bottom-0 -top-[1px] left-0 right-0"> </span>
 			</button>
 		{/if}

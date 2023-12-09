@@ -4,20 +4,24 @@
 	import SlideOver from '../../../components/General/SlideOver.svelte';
 	import MatchItem from '../../../components/Matches/MatchItem.svelte';
 	import { navbarStore } from '../../../stores/navbar.js';
-	import { seriesStore } from '../../../stores/series.js';
 	import type { Match, Player } from '../../../types';
 	import { Types } from 'mongoose';
-	type MatchStatus = 'upcoming' | 'live' | 'archived';
 
 	export let data;
 	// $: ({ matches = [], players } = data as { matches: Match[]; players: Player[] });
 	// $: matches = (data.matches || []).slice();
 	// $: players = data.players || [];
-	let matches: Match[] = [];
+	let name = '';
+	let selectedId: string = '';
+	let isLoading = false;
+
+	let matches: (Match & { _id?: string })[] = [];
 	let players: Player[] = [];
+	let playerMap = new Map();
 	let showSidePanel = false;
+
 	let admin = false;
-	function initNavbar() {
+	function init() {
 		navbarStore.update(() => {
 			return {
 				title: 'Matches',
@@ -33,8 +37,9 @@
 		// });
 		matches = data.matches || [];
 		players = data.players || [];
+		playerMap = data.playersMap || new Map();
 	}
-	initNavbar();
+	init();
 	//#region teamhandling
 	const classNames = (...classes: string[]) => {
 		return classes.filter(Boolean).join(' ');
@@ -46,9 +51,20 @@
 
 	let openModal = false;
 	let teamA: TeamItem[] = [];
-	let teamAIds: Set<string> = new Set();
+	let teamAIds: Set<Types.ObjectId> = new Set();
 	let teamB: TeamItem[] = [];
-	let teamBIds: Set<string> = new Set();
+	let teamBIds: Set<Types.ObjectId> = new Set();
+
+	// Check if showSidePanel changed to false
+	if (!showSidePanel) {
+		// Clear/reset variables when showSidePanel is false\
+		teamA = [];
+		teamAIds = new Set();
+		teamB = [];
+		teamBIds = new Set();
+		name = '';
+		selectedId = '';
+	}
 	const getInitials = (name: string) => {
 		const initials = name
 			.split(' ')
@@ -59,7 +75,7 @@
 	};
 
 	const handleAddTeam = async (team: string, person: Player) => {
-		const stringId = String(person._id);
+		const stringId = person._id;
 		const initials = getInitials(person.name);
 
 		let [arr1, set1, arr2, set2] =
@@ -108,6 +124,36 @@
 		}
 	};
 	//#endregion
+	//#region open detail
+	interface itemProps {
+		detail: Match & { _id: string };
+	}
+	const handleItemClicked = ({ detail }: itemProps) => {
+		selectedId = detail._id;
+		const { aTeam, bTeam } = detail;
+		teamA = aTeam.players.map((_id) => {
+			const name = playerMap.get(_id) || '';
+			return {
+				_id,
+				name,
+				initials: getInitials(name)
+			};
+		});
+		teamB = bTeam.players.map((_id) => {
+			const name = playerMap.get(_id) || '';
+			return {
+				_id,
+				name,
+				initials: getInitials(name)
+			};
+		});
+
+		teamAIds = new Set([...aTeam.players]);
+		teamBIds = new Set([...bTeam.players]);
+		showSidePanel = true;
+		name = detail.name;
+	};
+	//#endregion
 </script>
 
 <div class="flow-root mt-6">
@@ -115,7 +161,7 @@
 		{#each matches as match}
 			<li>
 				{#if match}
-					<MatchItem bind:match bind:admin />
+					<MatchItem bind:match bind:admin on:itemClicked={handleItemClicked} />
 				{/if}
 			</li>
 		{/each}
@@ -133,14 +179,18 @@
 <SlideOver bind:showSidePanel title="Create New Match">
 	<form
 		method="post"
-		action="?/create"
+		action="?/store"
 		use:enhance={({ formData, formElement }) => {
 			// Before form submission to server
 			// Optimistic UI
+
 			const name = String(formData.get('name'));
-			const aIds = [...teamAIds].map((row) => new Types.ObjectId(row));
-			const bIds = [...teamBIds].map((row) => new Types.ObjectId(row));
-			const newMatch = {
+			const arrA = [...teamAIds];
+			const arrB = [...teamBIds];
+			const aIds = arrA.map((row) => new Types.ObjectId(row));
+			const bIds = arrB.map((row) => new Types.ObjectId(row));
+			const newMatchToSave = {
+				_id: '',
 				name,
 				status: 'upcoming',
 				aTeam: { players: aIds, score: 0 },
@@ -149,18 +199,36 @@
 				createdAt: new Date(),
 				updatedAt: new Date()
 			};
-
-			matches = [newMatch, ...matches];
-			formData.append('data', JSON.stringify(newMatch));
-			// return async ({ update, result }) => {
-			// 	// 	// After form submission to server
-			// 	// 	const currentTodos = await getCurrentTodos();
-			// 	// 	// change todos to currentTodos from server
-			// 	// 	todos = currentTodos;
-			// 	// 	console.log('1.update todos with the right id from mongodb', todos);
-			// 	// 	isLoading = false;
-			// 	await update();
-			// };
+			const newMatchItem = {
+				...newMatchToSave,
+				aTeam: { players: arrA, score: 0 },
+				bTeam: { players: arrB, score: 0 }
+			};
+			if (selectedId == null) {
+				matches = [newMatchItem, ...matches];
+			} else {
+				newMatchToSave._id = selectedId || '';
+				newMatchItem._id = selectedId || '';
+				const index = matches.findIndex((item) => item._id === selectedId);
+				if (index !== -1) {
+					// Create a new array with the updated item
+					const newArray = [...matches];
+					newArray[index] = { ...newArray[index], ...newMatchItem };
+					matches = newArray;
+				}
+			}
+			formData.append('data', JSON.stringify(newMatchToSave));
+			isLoading = true;
+			return async ({ update, result }) => {
+				if (result.status == 200 && result.type == 'success') {
+					if (result.data && Array.isArray(result.data.records)) {
+						matches = result.data.records;
+					}
+				}
+				await update();
+				isLoading = false;
+				showSidePanel = false;
+			};
 		}}
 		slot="content"
 		class="flex flex-1 flex-col justify-between h-full"
@@ -172,7 +240,8 @@
 					<input
 						type="text"
 						name="name"
-						class="border text-sm rounded-md block w-full py-2 px-3 bg-gray-800 border-gray-600 placeholder-gray-500 focus:border-indigo-500 text-gray-500"
+						bind:value={name}
+						class="border text-sm rounded-md block w-full py-2 px-3 bg-gray-800 border-gray-600 placeholder-gray-500 focus:border-indigo-500 text-gray-400"
 						placeholder="Match 1"
 						required
 					/>
@@ -222,7 +291,7 @@
 															on:click={() => handleAddTeam('a', person)}
 															type="button"
 															class={classNames(
-																teamAIds.has(String(person._id)) ? 'bg-green-700' : '',
+																teamAIds.has(person._id) ? 'bg-green-700' : '',
 																'ring-1 ring-green-700 py-1 px-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant '
 															)}
 														>
@@ -232,7 +301,7 @@
 															on:click={() => handleAddTeam('b', person)}
 															type="button"
 															class={classNames(
-																teamBIds.has(String(person._id)) ? 'bg-green-700' : '',
+																teamBIds.has(person._id) ? 'bg-green-700' : '',
 																'ring-1 ring-green-700 py-1 px-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant '
 															)}
 														>
@@ -295,7 +364,17 @@
 			>
 				Cancel
 			</button>
+			{#if selectedId}
+				<button
+					type="button"
+					on:click={() => (showSidePanel = false)}
+					class="ml-4 inline-flex justify-center rounded-md border border-transparent bg-red-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+				>
+					Delete
+				</button>
+			{/if}
 			<button
+				disabled={isLoading}
 				type="submit"
 				class="ml-4 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
 			>

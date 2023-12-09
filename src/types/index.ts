@@ -20,3 +20,10 @@ export interface Match {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface Series {
+  name: string;
+  players: Types.ObjectId[];
+  matches: Match[];
+  createdBy: Types.ObjectId;
+}
