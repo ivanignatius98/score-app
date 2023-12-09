@@ -55,15 +55,16 @@
 	let teamB: TeamItem[] = [];
 	let teamBIds: Set<Types.ObjectId> = new Set();
 
-	// Check if showSidePanel changed to false
-	if (!showSidePanel) {
-		// Clear/reset variables when showSidePanel is false\
-		teamA = [];
-		teamAIds = new Set();
-		teamB = [];
-		teamBIds = new Set();
-		name = '';
-		selectedId = '';
+	$: {
+		if (!showSidePanel) {
+			// Clear/reset variables when showSidePanel is false\
+			teamA = [];
+			teamAIds = new Set();
+			teamB = [];
+			teamBIds = new Set();
+			name = 'Match ' + (matches.length + 1);
+			selectedId = '';
+		}
 	}
 	const getInitials = (name: string) => {
 		const initials = name
@@ -160,9 +161,7 @@
 	<ul role="list" class="-my-5 divide-y divide-gray-800">
 		{#each matches as match}
 			<li>
-				{#if match}
-					<MatchItem bind:match bind:admin on:itemClicked={handleItemClicked} />
-				{/if}
+				<MatchItem bind:match bind:admin on:itemClicked={handleItemClicked} />
 			</li>
 		{/each}
 	</ul>
@@ -180,7 +179,7 @@
 	<form
 		method="post"
 		action="?/store"
-		use:enhance={({ formData, formElement }) => {
+		use:enhance={({ formData, formElement, cancel }) => {
 			// Before form submission to server
 			// Optimistic UI
 
@@ -204,18 +203,20 @@
 				aTeam: { players: arrA, score: 0 },
 				bTeam: { players: arrB, score: 0 }
 			};
-			if (selectedId == null) {
+			if (selectedId == '') {
 				matches = [newMatchItem, ...matches];
 			} else {
+				const index = matches.findIndex((item) => item._id === selectedId);
+				if (index == -1) {
+					cancel();
+					return;
+				}
 				newMatchToSave._id = selectedId || '';
 				newMatchItem._id = selectedId || '';
-				const index = matches.findIndex((item) => item._id === selectedId);
-				if (index !== -1) {
-					// Create a new array with the updated item
-					const newArray = [...matches];
-					newArray[index] = { ...newArray[index], ...newMatchItem };
-					matches = newArray;
-				}
+				// Create a new array with the updated item
+				const newArray = [...matches];
+				newArray[index] = { ...newArray[index], ...newMatchItem };
+				matches = newArray;
 			}
 			formData.append('data', JSON.stringify(newMatchToSave));
 			isLoading = true;

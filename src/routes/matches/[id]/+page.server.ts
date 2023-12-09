@@ -1,13 +1,14 @@
 import { Types } from "mongoose";
 import { Series } from "../../../models/Series";
+import { User } from '../../../models/User'
 import type { Player } from '../../../types';
 
 import type { Actions, Load } from '@sveltejs/kit';
 
 export const load: Load = async ({ params }) => {
   const series = await Series.findOne({ _id: params.id })
-    .populate('players').lean();
-
+    .populate('players')
+    .lean();
   if (!series) {
     return { acknowledge: false, matches: [], players: [] }
   }
@@ -28,15 +29,17 @@ export const actions: Actions = {
     const data = formData.get('data');
     const parsed = JSON.parse(data as string)
     const objToSave = {
-      ...parsed, createdBy: new Types.ObjectId(parsed.createdBy)
+      ...parsed,
+      createdBy: new Types.ObjectId(parsed.createdBy)
     };
     const series = await Series.findOne({ _id: params.id });
     if (!series)
       return { success: false }
 
     const matches = [...series.matches]
+    let { _id, ...newSave } = objToSave
     if (parsed._id) {
-      const _id = new Types.ObjectId(parsed._id)
+      _id = new Types.ObjectId(_id)
       const index = matches.findIndex((item) => item._id && item._id.equals(_id));
       if (index !== -1) {
         // Create a new array with the updated item
@@ -46,7 +49,7 @@ export const actions: Actions = {
         console.log("newArray", newArray)
       }
     } else {
-      series.matches.push(objToSave)
+      (series as any).matches = [newSave, ...series.matches]
     }
     const records = await series.save()
     return {
