@@ -1,6 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
 
-import { User } from './User';
 const MatchSchema = new mongoose.Schema({
   name: String,
   status: {
