@@ -2,15 +2,13 @@
 	import { enhance } from '$app/forms';
 	import Modal from '../../../components/General/Modal.svelte';
 	import SlideOver from '../../../components/General/SlideOver.svelte';
-	import MatchItem from '../../../components/Matches/MatchItem.svelte';
+	import ListItem from '../../../components/General/ListItem.svelte';
+	import { getInitials } from '../../../helpers/general.js';
 	import { navbarStore } from '../../../stores/navbar.js';
 	import type { Match, Player } from '../../../types';
 	import { Types } from 'mongoose';
 
 	export let data;
-	// $: ({ matches = [], players } = data as { matches: Match[]; players: Player[] });
-	// $: matches = (data.matches || []).slice();
-	// $: players = data.players || [];
 	let name = '';
 	let selectedId: string = '';
 	let isLoading = false;
@@ -20,7 +18,6 @@
 	let playerMap = new Map();
 	let showSidePanel = false;
 
-	let admin = false;
 	function init() {
 		navbarStore.update(() => {
 			return {
@@ -66,14 +63,6 @@
 			selectedId = '';
 		}
 	}
-	const getInitials = (name: string) => {
-		const initials = name
-			.split(' ')
-			.map((word: string) => word.charAt(0).toUpperCase())
-			.slice(0, 2)
-			.join('');
-		return initials;
-	};
 
 	const handleAddTeam = async (team: string, person: Player) => {
 		const stringId = person._id;
@@ -161,7 +150,7 @@
 	<ul role="list" class="-my-5 divide-y divide-gray-800">
 		{#each matches as match}
 			<li>
-				<MatchItem bind:match bind:admin on:itemClicked={handleItemClicked} />
+				<ListItem bind:item={match} on:itemClicked={handleItemClicked} />
 			</li>
 		{/each}
 	</ul>
@@ -237,7 +226,7 @@
 		<div class="divide-y divide-gray-200 px-4 sm:px-6">
 			<div class="space-y-6">
 				<div>
-					<label for="name" class="block mb-2 text-sm text-white">First name</label>
+					<label for="name" class="block mb-2 text-sm text-white">Match name</label>
 					<input
 						type="text"
 						name="name"

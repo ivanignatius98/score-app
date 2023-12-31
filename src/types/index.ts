@@ -23,7 +23,8 @@ export interface Match {
 
 export interface Series {
   name: string;
-  players: Types.ObjectId[];
+  date: string;
+  players: Player[];
   matches: Match[];
   createdBy: Types.ObjectId;
 }

@@ -28,23 +28,19 @@ export const actions: Actions = {
     const formData = await request.formData();
     const data = formData.get('data');
     const parsed = JSON.parse(data as string)
-    const objToSave = {
-      ...parsed,
-      createdBy: new Types.ObjectId(parsed.createdBy)
-    };
     const series = await Series.findOne({ _id: params.id });
     if (!series)
       return { success: false }
 
     const matches = [...series.matches]
-    let { _id, ...newSave } = objToSave
-    if (parsed._id) {
+    let { _id, ...newSave } = parsed
+    if (_id) {
       _id = new Types.ObjectId(_id)
       const index = matches.findIndex((item) => item._id && item._id.equals(_id));
       if (index !== -1) {
         // Create a new array with the updated item
         const newArray = matches;
-        newArray[index] = { ...newArray[index], ...objToSave };
+        newArray[index] = { ...newArray[index], ...parsed };
         (series as any).matches = newArray
         console.log("newArray", newArray)
       }
