@@ -28,3 +28,9 @@ export interface Series {
   matches: Match[];
   createdBy: Types.ObjectId;
 }
+
+export interface NavValue {
+  title: string;
+  buttonAction: () => void;
+  breadcrumbs: { href: string; label: string }[];
+}

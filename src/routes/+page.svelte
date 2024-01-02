@@ -3,8 +3,8 @@
 	import Modal from '../components/General/Modal.svelte';
 	import SlideOver from '../components/General/SlideOver.svelte';
 	import ListItem from '../components/General/ListItem.svelte';
-	import { navbarStore } from '../stores/navbar.js';
-	import type { Player, Series } from '../types';
+	import { navbarStore } from '../stores/navbar.ts';
+	import type { NavValue, Player, Series } from '../types';
 	import { getInitials } from '../helpers/general.js';
 	import { enhance } from '$app/forms';
 	import Dropdown from '../components/General/Dropdown.svelte';
@@ -26,19 +26,14 @@
 	const [formattedDate] = currentDate.toISOString().split('T');
 
 	function init() {
-		navbarStore.update(() => {
-			return {
-				title: 'Series',
-				buttonAction: () => {
-					showSidePanel = true;
-				}
-			};
-		});
-		// seriesStore.update(() => {
-		// 	return {
-		// 		matches: ['Matches']
-		// 	};
-		// });
+		navbarStore.update((current: NavValue) => ({
+			...current,
+			title: 'Series',
+			buttonAction: () => {
+				showSidePanel = true;
+			},
+			breadcrumbs: [{ href: '#', label: 'test' }]
+		}));
 
 		series = data.series || [];
 		members = data.members || [];
@@ -136,7 +131,10 @@
 	<ul role="list" class="-my-5 divide-y divide-gray-800">
 		{#each series as row}
 			<li>
-				<ListItem item={{ ...row, desc: (new Date(row.date)).toDateString() }} on:itemClicked={handleItemClicked} />
+				<ListItem
+					item={{ ...row, desc: new Date(row.date).toDateString() }}
+					on:itemClicked={handleItemClicked}
+				/>
 			</li>
 		{/each}
 	</ul>

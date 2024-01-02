@@ -4,8 +4,8 @@
 	import SlideOver from '../../../components/General/SlideOver.svelte';
 	import ListItem from '../../../components/General/ListItem.svelte';
 	import { getInitials } from '../../../helpers/general.js';
-	import { navbarStore } from '../../../stores/navbar.js';
-	import type { Match, Player } from '../../../types';
+	import { navbarStore } from '../../../stores/navbar.ts';
+	import type { Match, NavValue, Player } from '../../../types';
 	import { Types } from 'mongoose';
 
 	export let data;
@@ -19,14 +19,15 @@
 	let showSidePanel = false;
 
 	function init() {
-		navbarStore.update(() => {
-			return {
-				title: 'Matches',
-				buttonAction: () => {
-					showSidePanel = true;
-				}
-			};
-		});
+		navbarStore.update((current: NavValue) => ({
+			...current,
+			title: 'Matches',
+			buttonAction: () => {
+				showSidePanel = true;
+			},
+			breadcrumbs: [{ href: '#', label: 'Series' }]
+		}));
+
 		// seriesStore.update(() => {
 		// 	return {
 		// 		matches: ['Matches']
