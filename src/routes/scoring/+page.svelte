@@ -1,4 +1,6 @@
 <script>
+	import Counter from '../../components/General/Counter.svelte';
+
 	// import { seriesStore } from '../../stores/series';
 
 	// const colors = ['red', 'orange', 'yellow'];
@@ -41,6 +43,7 @@
 		{/each}
 	</div>
 </div> -->
+<Counter />
 <div class="my-4">
 	Yeriel FG: {yerielMake}/{yerielAttempt} - 3PT: {yerielMake3}/{yerielAttempt3}
 	<div class="flex gap-4">
