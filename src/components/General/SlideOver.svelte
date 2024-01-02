@@ -3,6 +3,7 @@
 	import { clickOutside } from '../../helpers/click_outside';
 	export let showSidePanel = false;
 	export let title = '';
+	export let description = '';
 	let width;
 </script>
 
@@ -48,7 +49,7 @@
 									</div>
 									<div class="mt-1">
 										<p class="text-sm text-indigo-300">
-											Get started by filling in the information below to create your new project.
+											{description}
 										</p>
 									</div>
 								</div>

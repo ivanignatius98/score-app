@@ -36,6 +36,7 @@ const MatchSchema = new mongoose.Schema({
 
 const SeriesSchema = new mongoose.Schema({
   name: String,
+  date: Date,
   players: [{
     type: Schema.Types.ObjectId,
     ref: 'User'
