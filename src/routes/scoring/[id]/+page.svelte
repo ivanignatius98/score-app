@@ -198,6 +198,23 @@
 			B
 		</button>
 	</div>
+	<div class="flex p-8 items-center bg-gray-700">
+		<div class="flex gap-4 flex-1 justify-center items-center">
+			<span class="bg-red-500 inline-flex items-center justify-center h-12 w-12 rounded-full">
+				<span class="text-lg font-medium leading-none text-white group-hover:text-gray-300">A</span>
+			</span>
+			<span class=" font-semibold">Team A</span>
+		</div>
+		<div class="flex gap-4 flex-1 justify-center items-center">
+			<span class="bg-blue-500 inline-flex items-center justify-center h-12 w-12 rounded-full">
+				<span class="text-lg font-medium leading-none text-white group-hover:text-gray-300">B</span>
+			</span>
+			<span class=" font-semibold">Team B</span>
+		</div>
+	</div>
+
+	<article>test</article>
+
 	{#each history as row}
 		<article>{row.player.name} {row.action}</article>
 	{/each}
