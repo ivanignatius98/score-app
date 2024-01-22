@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Counter from '../../../components/General/Counter.svelte';
 	import Modal from '../../../components/General/Modal.svelte';
+	import ActionPairs from './ActionPairs.svelte';
 	import { navbarStore } from '../../../stores/navbar';
 	import type { NavValue, Player } from '../../../types';
 
@@ -38,7 +39,6 @@
 
 		aPlayers = data.aPlayers || [];
 		bPlayers = data.bPlayers || [];
-		console.log(data);
 	}
 	init();
 
@@ -52,6 +52,27 @@
 
 	const classNames = (...classes: string[]) => {
 		return classes.filter(Boolean).join(' ');
+	};
+	interface itemProps {
+		detail: {
+			team: string;
+			action: string;
+		};
+	}
+	const handleActionClicked = ({ detail }: itemProps) => {
+		const { team, action } = detail;
+		openModal = true;
+		players = team == 'a' ? aPlayers : bPlayers;
+		currTeam = team;
+		currAction = action;
+	};
+	const handleActionSubmit = (person: Player) => {
+		if (currAction == '+2') {
+			if (currTeam == 'a') aPoints += 2;
+			else if (currTeam == 'b') bPoints += 2;
+		}
+		history = [...history, { team: currTeam, player: person, action: currAction }];
+		openModal = false;
 	};
 </script>
 
@@ -90,12 +111,7 @@
 				<button
 					type="button"
 					on:click={() => {
-						if (currAction == '+2') {
-							if (currTeam == 'a') aPoints++;
-							else if (currTeam == 'b') bPoints++;
-						}
-						history = [...history, { team: currTeam, player: person, action: currAction }];
-						openModal = false;
+						handleActionSubmit(person);
 					}}
 					class=" ring-1 ring-green-700 py-1 px-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant"
 				>
@@ -122,57 +138,10 @@
 		</div>
 	</div>
 	<hr class="my-8 border-t border-gray-600 h-0.5" />
-	<div class="flex justify-evenly gap-3 items-center">
-		<button
-			on:click={() => {
-				openModal = true;
-				players = aPlayers;
-				currTeam = 'a';
-				currAction = '+2';
-			}}
-			type="button"
-			class="flex flex-1 h-14 justify-center font-bold ring-1 ring-green-600 py-1 px-4 items-center border border-transparent rounded-sm shadow-sm text-green-600 bg-transparant"
-		>
-			+2
-		</button>
-		<button
-			on:click={() => {
-				openModal = true;
-				players = aPlayers;
-				currTeam = 'a';
-				currAction = '/2';
-			}}
-			type="button"
-			class="flex flex-1 h-14 justify-center font-bold ring-1 ring-red-600 py-1 px-4 items-center border border-transparent rounded-sm shadow-sm text-red-600 bg-transparant"
-		>
-			2
-		</button>
-		-
-		<button
-			on:click={() => {
-				openModal = true;
-				players = bPlayers;
-				currTeam = 'b';
-				currAction = '+2';
-			}}
-			type="button"
-			class="flex flex-1 h-14 justify-center font-bold ring-1 ring-green-600 py-1 px-4 items-center border border-transparent rounded-sm shadow-sm text-green-600 bg-transparant"
-		>
-			+2
-		</button>
-		<button
-			on:click={() => {
-				openModal = true;
-				players = bPlayers;
-				currTeam = 'b';
-				currAction = '/2';
-			}}
-			type="button"
-			class="flex flex-1 h-14 justify-center font-bold ring-1 ring-red-600 py-1 px-4 items-center border border-transparent rounded-sm shadow-sm text-red-600 bg-transparant"
-		>
-			2
-		</button>
-	</div>
+
+	<ActionPairs actionValue="1" on:click={handleActionClicked} />
+	<ActionPairs actionValue="2" on:click={handleActionClicked} />
+
 	<hr class="my-8 border-t border-gray-600 h-0.5" />
 	<div class="flex justify-evenly items-center shadow-lg">
 		<button
