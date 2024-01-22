@@ -197,9 +197,9 @@
 						series = result.data.records;
 					}
 				}
-				await update();
 				isLoading = false;
 				showSidePanel = false;
+				await update();
 			};
 		}}
 		slot="content"

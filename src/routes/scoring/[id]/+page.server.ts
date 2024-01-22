@@ -1,5 +1,6 @@
 import { Types } from "mongoose";
 import { Series } from "../../../models/Series";
+import { User } from "../../../models/User";
 import type { Player, Match } from '../../../types';
 
 import type { Actions, Load } from '@sveltejs/kit';

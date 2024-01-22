@@ -407,7 +407,7 @@
 						tabindex="-1"
 					>
 						<a
-							href={`/scores/${selectedId}`}
+							href={`/scoring/${selectedId}`}
 							class="block px-4 py-2 text-sm hover:bg-gray-700 rounded-t-lg"
 							role="menuitem"
 							tabindex="-1"
