@@ -34,13 +34,9 @@ export const actions: Actions = {
     if (_id) {
       series = await Series.findOne({ _id });
       if (series) {
-        // Update existing series properties with newSave
         Object.assign(series, newSave);
       } else {
-        // Handle the case where no series is found with the given _id
         console.error('Series not found with _id:', _id);
-        // Optionally, you can choose to create a new series in this case
-        // series = new Series(newSave);
       }
     } else {
       series = new Series(newSave);

@@ -77,7 +77,7 @@
 	</div>
 	<div class="mt-2 sm:flex sm:items-center sm:justify-between">
 		<div class="flex-1 min-w-0">
-			<h2 class="text-2xl font-bold leading-7 text-white sm:truncate">
+			<h2 class="text-2xl font-bold leading-7 text-white">
 				{navValue.title}
 			</h2>
 		</div>

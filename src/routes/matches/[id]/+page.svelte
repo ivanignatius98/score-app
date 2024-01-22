@@ -7,11 +7,13 @@
 	import { navbarStore } from '../../../stores/navbar.ts';
 	import type { Match, NavValue, Player } from '../../../types';
 	import { Types } from 'mongoose';
+	import Dropdown from '../../../components/General/Dropdown.svelte';
 
 	export let data;
 	let name = '';
 	let selectedId: string = '';
 	let isLoading = false;
+	let showDropdown = false;
 
 	let matches: (Match & { _id?: string })[] = [];
 	let players: Player[] = [];
@@ -55,7 +57,6 @@
 
 	$: {
 		if (!showSidePanel) {
-			// Clear/reset variables when showSidePanel is false\
 			teamA = [];
 			teamAIds = new Set();
 			teamB = [];
@@ -80,7 +81,7 @@
 			const foundIndex = arr1.findIndex((obj) => obj._id === person._id);
 			if (foundIndex !== -1) {
 				const temp = [...arr1];
-				const [deleted] = temp.splice(foundIndex, 1);
+				temp.splice(foundIndex, 1);
 				arr1 = temp;
 				set1 = new Set([...set1]);
 			}
@@ -96,7 +97,7 @@
 			const foundIndex = arr2.findIndex((obj) => obj._id === person._id);
 			if (foundIndex !== -1) {
 				const temp = [...arr2];
-				const [deleted] = temp.splice(foundIndex, 1);
+				temp.splice(foundIndex, 1);
 				arr2 = temp;
 				set2 = new Set([...set2]);
 			}
@@ -151,7 +152,10 @@
 	<ul role="list" class="-my-5 divide-y divide-gray-800">
 		{#each matches as match}
 			<li>
-				<ListItem bind:item={match} on:itemClicked={handleItemClicked} />
+				<ListItem
+					item={{ ...match, desc: new Date(match.createdAt).toDateString() }}
+					on:itemClicked={handleItemClicked}
+				/>
 			</li>
 		{/each}
 	</ul>
@@ -165,7 +169,7 @@
 	</button>
 </div>
 
-<SlideOver bind:showSidePanel title="Create New Match">
+<SlideOver bind:showSidePanel title={`${selectedId ? 'Update' : 'Create New'}  Match`}>
 	<form
 		method="post"
 		action="?/store"
@@ -271,38 +275,51 @@
 								>
 							</button>
 							<Modal title="Edit your details" bind:openModal>
-								<div class="overflow-y-auto overflow-x-hidden max-h-64" slot="content">
-									<ul role="list" class="-my-4 text-sm py-8">
-										{#each players as person}
-											<li class="py-3 px-8 rounded-md">
-												<div class="flex justify-between items-center">
-													{person.name}
-													<div class="flex gap-2">
-														<button
-															on:click={() => handleAddTeam('a', person)}
-															type="button"
-															class={classNames(
-																teamAIds.has(person._id) ? 'bg-green-700' : '',
-																'ring-1 ring-green-700 py-1 px-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant '
-															)}
-														>
-															Team A
-														</button>
-														<button
-															on:click={() => handleAddTeam('b', person)}
-															type="button"
-															class={classNames(
-																teamBIds.has(person._id) ? 'bg-green-700' : '',
-																'ring-1 ring-green-700 py-1 px-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant '
-															)}
-														>
-															Team B
-														</button>
+								<div slot="content">
+									<div class="overflow-y-auto overflow-x-hidden max-h-64">
+										<ul role="list" class="-my-4 text-sm py-8">
+											{#each players as person}
+												<li class="py-3 px-8 rounded-md">
+													<div class="flex justify-between items-center">
+														{person.name}
+														<div class="flex gap-2">
+															<button
+																on:click={() => handleAddTeam('a', person)}
+																type="button"
+																class={classNames(
+																	teamAIds.has(person._id) ? 'bg-green-700' : '',
+																	'ring-1 ring-green-700 py-1 px-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant '
+																)}
+															>
+																Team A
+															</button>
+															<button
+																on:click={() => handleAddTeam('b', person)}
+																type="button"
+																class={classNames(
+																	teamBIds.has(person._id) ? 'bg-green-700' : '',
+																	'ring-1 ring-green-700 py-1 px-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant '
+																)}
+															>
+																Team B
+															</button>
+														</div>
 													</div>
-												</div>
-											</li>
-										{/each}
-									</ul>
+												</li>
+											{/each}
+										</ul>
+									</div>
+									<div class="p-6 border-t-[1px] border-slate-700">
+										<button
+											on:click={() => {
+												openModal = false;
+											}}
+											class="p-2 bg-blue-500 w-full rounded-md text-sm disabled:bg-blue-300"
+											type="button"
+										>
+											Dismiss
+										</button>
+									</div>
 								</div>
 							</Modal>
 						</div>
@@ -347,30 +364,64 @@
 			</div>
 		</div>
 
-		<div class="flex flex-shrink-0 justify-end px-4 py-4">
-			<button
-				type="button"
-				class="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-				on:click={() => (showSidePanel = false)}
-			>
-				Cancel
-			</button>
-			{#if selectedId}
-				<button
-					type="button"
-					on:click={() => (showSidePanel = false)}
-					class="ml-4 inline-flex justify-center rounded-md border border-transparent bg-red-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-				>
-					Delete
-				</button>
-			{/if}
+		<div class="flex flex-shrink-0 p-4 gap-3 items-center">
 			<button
 				disabled={isLoading}
 				type="submit"
-				class="ml-4 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+				class="flex-1 justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
 			>
 				Save
 			</button>
+			<!-- <button
+				type="button"
+				class="flex-1 rounded-md bg-gray-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-gray-500"
+				on:click={() => (showSidePanel = false)}
+			>
+				Cancel
+			</button> -->
+			{#if selectedId}
+				<input name="id" type="hidden" bind:value={selectedId} />
+				<Dropdown bind:showDropdown>
+					<button
+						slot="button-activator"
+						on:click={() => (showDropdown = !showDropdown)}
+						type="button"
+						class="h-9 w-9 bg-gray-600 hover:bg-gray-500 p-2 rounded-lg"
+					>
+						<span class="sr-only">actions</span>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 20 20"
+							fill="currentColor"
+							aria-hidden="true"
+							class="nz sb"
+							><path
+								d="M10 3a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM10 8.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM11.5 15.5a1.5 1.5 0 10-3 0 1.5 1.5 0 003 0z"
+							></path></svg
+						>
+					</button>
+					<div
+						role="none"
+						slot="dropdown-items"
+						class="origin-bottom-right absolute z-10 right-0 bottom-14 mt-2 w-32 bg-gray-800 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+						tabindex="-1"
+					>
+						<a
+							href={`/scores/${selectedId}`}
+							class="block px-4 py-2 text-sm hover:bg-gray-700 rounded-t-lg"
+							role="menuitem"
+							tabindex="-1"
+							id="user-menu-item-0">View Score</a
+						>
+
+						<button
+							formaction="?/delete"
+							class="w-full px-4 py-2 text-sm bg-red-800 hover:bg-red-700 rounded-b-lg text-left"
+							>Delete</button
+						>
+					</div>
+				</Dropdown>
+			{/if}
 		</div>
 	</form>
 </SlideOver>
