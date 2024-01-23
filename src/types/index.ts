@@ -34,3 +34,8 @@ export interface NavValue {
   buttonAction: () => void;
   breadcrumbs: { href: string; label: string }[];
 }
+
+export interface Action {
+  made: boolean;
+  value: string;
+}

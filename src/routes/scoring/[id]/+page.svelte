@@ -1,9 +1,10 @@
 <script lang="ts">
 	import Counter from '../../../components/General/Counter.svelte';
 	import Modal from '../../../components/General/Modal.svelte';
+
 	import ActionPairs from './ActionPairs.svelte';
 	import { navbarStore } from '../../../stores/navbar';
-	import type { NavValue, Player } from '../../../types';
+	import type { NavValue, Player, Action } from '../../../types';
 
 	// import { seriesStore } from '../../stores/series';
 
@@ -19,11 +20,19 @@
 	export let data;
 	let players: Player[] = [];
 	let currTeam: string = '';
-	let currAction: string = '';
+	let currAction: Action | null = null;
 	let aPlayers: Player[] = [];
 	let bPlayers: Player[] = [];
 	let openModal = false;
-	let history: { team: string; action: string; player: Player }[] = [];
+	let history: {
+		team: string;
+		action: Action;
+		player: Player;
+		currentPoint: {
+			a: number;
+			b: number;
+		};
+	}[] = [];
 	let aPoints = 0;
 	let bPoints = 0;
 
@@ -46,7 +55,7 @@
 		if (!openModal) {
 			players = [];
 			currTeam = '';
-			currAction = '';
+			currAction = null;
 		}
 	}
 
@@ -56,7 +65,7 @@
 	interface itemProps {
 		detail: {
 			team: string;
-			action: string;
+			action: { made: boolean; value: string };
 		};
 	}
 	const handleActionClicked = ({ detail }: itemProps) => {
@@ -67,11 +76,23 @@
 		currAction = action;
 	};
 	const handleActionSubmit = (person: Player) => {
-		if (currAction == '+2') {
-			if (currTeam == 'a') aPoints += 2;
-			else if (currTeam == 'b') bPoints += 2;
+		if (!currAction) return;
+		if (currAction?.made) {
+			if (currTeam == 'a') aPoints += Number(currAction?.value);
+			else if (currTeam == 'b') bPoints += Number(currAction?.value);
 		}
-		history = [...history, { team: currTeam, player: person, action: currAction }];
+		history = [
+			...history,
+			{
+				team: currTeam,
+				player: person,
+				action: currAction,
+				currentPoint: {
+					a: aPoints,
+					b: bPoints
+				}
+			}
+		];
 		openModal = false;
 	};
 </script>
@@ -168,7 +189,7 @@
 		</button>
 	</div>
 	<section class=" p-4 bg-gray-700">
-		<div class="hidden sm:flex items-center">
+		<div class="hidden sm:flex items-center mb-10">
 			<div class="flex gap-4 flex-1 justify-center items-center">
 				<span class="bg-red-500 inline-flex items-center justify-center h-12 w-12 rounded-full">
 					<span class="text-lg font-medium leading-none text-white group-hover:text-gray-300"
@@ -187,20 +208,25 @@
 			</div>
 		</div>
 		<div class="my-1">
-			{#each history as row}
-				<article>{row.player.name} {row.action}</article>
-			{/each}
-			<article class="">
-				12:00
-				<span class="bg-red-500 inline-flex items-center justify-center h-12 w-12 rounded-full">
-					<span class="text-lg font-medium leading-none text-white group-hover:text-gray-300"
-						>A</span
+			{#each history as { action, team, player, currentPoint }, i}
+				<article class="flex items-center text-sm my-2">
+					<!-- <p class="font-thin mr-4">12:00</p> -->
+					<p class="font-thin mr-4 w-5">
+						{action.made ? `${currentPoint.a}-${currentPoint.b}` : ''}
+					</p>
+					<span
+						class={classNames(
+							team == 'a' ? 'bg-red-500' : 'bg-blue-500',
+							' inline-flex items-center justify-center rounded-full h-8 w-8'
+						)}
 					>
-				</span>
-				test2
-			</article>
-			<article>test</article>
-			<article>test</article>
+						<span class="text-md font-medium leading-none text-white group-hover:text-gray-300"
+							>{team.toUpperCase()}</span
+						>
+					</span>
+					<span class="pl-2 py-1"> {action.made ? '' : 'Miss'} {player.name} 3 PT Shot</span>
+				</article>
+			{/each}
 		</div>
 	</section>
 </div>
