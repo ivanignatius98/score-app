@@ -18,7 +18,7 @@ const StatSchema = new mongoose.Schema({
     x: Number,
     y: Number
   },
-  make: {
+  made: {
     type: Boolean,
     default: false
   },
