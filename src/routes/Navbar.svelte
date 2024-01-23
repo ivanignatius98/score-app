@@ -2,7 +2,11 @@
 	import { goto } from '$app/navigation';
 	import { navbarStore } from '../stores/navbar.ts';
 	import type { NavValue } from '../types';
-	let navValue: NavValue = { title: '', buttonAction: () => {}, breadcrumbs: [] };
+	let navValue: NavValue = {
+		title: '',
+		button: { label: 'Create', action: () => {} },
+		breadcrumbs: []
+	};
 
 	navbarStore.subscribe((value) => {
 		navValue = value;
@@ -83,7 +87,7 @@
 		</div>
 		<div class="mt-4 flex-shrink-0 flex md:mt-0 md:ml-4">
 			<button
-				on:click={() => navValue.buttonAction()}
+				on:click={() => navValue.button.action()}
 				type="button"
 				class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500"
 			>

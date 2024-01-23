@@ -31,11 +31,15 @@ export interface Series {
 
 export interface NavValue {
   title: string;
-  buttonAction: () => void;
+  button: {
+    label: string,
+    action: () => void
+  }
   breadcrumbs: { href: string; label: string }[];
 }
 
 export interface Action {
   made: boolean;
-  value: string;
+  value?: number;
+  type: string
 }

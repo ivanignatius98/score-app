@@ -6,17 +6,6 @@
 	import { navbarStore } from '../../../stores/navbar';
 	import type { NavValue, Player, Action } from '../../../types';
 
-	// import { seriesStore } from '../../stores/series';
-
-	// const colors = ['red', 'orange', 'yellow'];
-
-	// let active = '';
-
-	// let navValue = { matches: [''] };
-
-	// const unsubscribe = seriesStore.subscribe((value) => {
-	// 	navValue = value;
-	// });
 	export let data;
 	let players: Player[] = [];
 	let currTeam: string = '';
@@ -40,8 +29,9 @@
 		navbarStore.update((current: NavValue) => ({
 			...current,
 			title: 'Scoring',
-			buttonAction: () => {
-				// showSidePanel = true;
+			button: {
+				label: 'Create',
+				action: () => {}
 			},
 			breadcrumbs: [{ href: '#', label: 'test' }]
 		}));
@@ -65,7 +55,7 @@
 	interface itemProps {
 		detail: {
 			team: string;
-			action: { made: boolean; value: string };
+			action: Action;
 		};
 	}
 	const handleActionClicked = ({ detail }: itemProps) => {
@@ -77,9 +67,9 @@
 	};
 	const handleActionSubmit = (person: Player) => {
 		if (!currAction) return;
-		if (currAction?.made) {
-			if (currTeam == 'a') aPoints += Number(currAction?.value);
-			else if (currTeam == 'b') bPoints += Number(currAction?.value);
+		if (currAction?.made && currAction?.value) {
+			if (currTeam == 'a') aPoints += currAction?.value;
+			else if (currTeam == 'b') bPoints += currAction?.value;
 		}
 		history = [
 			...history,
@@ -160,8 +150,8 @@
 	</div>
 	<hr class="my-8 border-t border-gray-600 h-0.5" />
 
-	<ActionPairs actionValue="1" on:click={handleActionClicked} />
-	<ActionPairs actionValue="2" on:click={handleActionClicked} />
+	<ActionPairs action={{ value: 1, type: 'FG' }} on:click={handleActionClicked} />
+	<ActionPairs action={{ value: 2, type: '3PT' }} on:click={handleActionClicked} />
 
 	<hr class="my-8 border-t border-gray-600 h-0.5" />
 	<div class="flex justify-evenly items-center shadow-lg">
@@ -211,7 +201,7 @@
 			{#each history as { action, team, player, currentPoint }, i}
 				<article class="flex items-center text-sm my-2">
 					<!-- <p class="font-thin mr-4">12:00</p> -->
-					<p class="font-thin mr-4 w-5">
+					<p class="font-thin w-10">
 						{action.made ? `${currentPoint.a}-${currentPoint.b}` : ''}
 					</p>
 					<span
@@ -224,7 +214,9 @@
 							>{team.toUpperCase()}</span
 						>
 					</span>
-					<span class="pl-2 py-1"> {action.made ? '' : 'Miss'} {player.name} 3 PT Shot</span>
+					<span class={classNames(action.made ? 'font-semibold' : '', 'pl-2 py-1')}>
+						{action.made ? '' : 'Miss'} {player.name} {action.type} Shot</span
+					>
 				</article>
 			{/each}
 		</div>

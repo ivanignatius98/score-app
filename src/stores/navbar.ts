@@ -2,15 +2,18 @@
 import { writable } from 'svelte/store';
 interface NavValue {
   title: string;
-  buttonAction: () => void;
+  button: {
+    label: string,
+    action: () => void
+  }
   breadcrumbs: { href: string; label: string }[];
 }
 
 const initialState: NavValue = {
   title: 'Default Title',
-  buttonAction: () => {
-    // Default action
-    console.log('Default button action');
+  button: {
+    label: "Create",
+    action: () => { }
   },
   breadcrumbs: []
 };
