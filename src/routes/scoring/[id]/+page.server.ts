@@ -1,39 +1,109 @@
 import { Types } from "mongoose";
-import { Series } from "../../../models/Series";
+import { Match } from "../../../models/Match";
 import { User } from "../../../models/User";
 import { Stat } from "../../../models/Stat";
-import type { Player, Match } from '../../../types';
+import type { Player, Match as MatchType, Action } from '../../../types';
 
-import type { Actions, Load } from '@sveltejs/kit';
+import type { Load } from '@sveltejs/kit';
 
 export const load: Load = async ({ params }) => {
-  const series = await Series.findOne({ 'matches._id': params.id },
-    { matches: 1 })
-    .populate('players')
-    .lean();
-  if (!series) {
-    return { acknowledge: false, matches: [], players: [] }
-  }
-  const { matches, players } = JSON.parse(JSON.stringify(series));
-  const match = matches.find((item: (Match & { _id: string })) => item._id === params.id);
-  function mapPlayers(teamPlayers: string[], dataMap: Map<string, string>) {
-    return teamPlayers.map((item) => ({
-      _id: new Types.ObjectId(item),
-      name: dataMap.get(item) // Set the desired name
-    }));
-  }
-  const { aTeam, bTeam } = match
-  const dataMap: Map<string, string> = new Map(players.map((item: Player) => [item._id, item.name]));
+  const typeValues = new Map([
+    ['FG', 1],
+    ['3PT', 2]
+  ])
 
-  const aPlayers = mapPlayers(aTeam.players, dataMap);
-  const bPlayers = mapPlayers(bTeam.players, dataMap);
+  const match = await Match.findOne({ _id: params.id })
+    .populate('aTeam.players')
+    .populate('bTeam.players')
+    .lean();
+  if (!match) {
+    return { acknowledge: false, }
+  }
+  const parsed = JSON.parse(JSON.stringify(match))
+  const { aTeam, bTeam } = parsed
+
+  const aMap: Map<string, Player> = new Map(aTeam.players.map((item: Player) => [item._id, item]));
+  const bMap: Map<string, Player> = new Map(bTeam.players.map((item: Player) => [item._id, item]));
+  const combinedMap = new Map([...aMap, ...bMap]);
+
+  const stats = await Stat.find({ match_id: params.id })
+    .lean();
+  const parsedStats = JSON.parse(JSON.stringify(stats))
+  // sanitize
+  const history: {
+    team: string;
+    action: Action;
+    player: Player | undefined;
+    currentPoint: {
+      a: number;
+      b: number;
+    };
+  }[] = []
+
+  let playerStats = new Map()
+  console.log(playerStats)
+
+  let aPoints = 0
+  let bPoints = 0
+  for (let row of parsedStats) {
+    const playerIsATeam = aMap.get(row.player)
+    const team = playerIsATeam ? "a" : "b"
+    const val = typeValues.get(row.type)
+    if (row.made && val) {
+      if (team == "a") {
+        aPoints += val
+      } else if (team == "b") {
+        bPoints += val
+      }
+    }
+
+    const defStat = {
+      "FG": {
+        made: 0,
+        attempt: 0
+      },
+      "3PT": {
+        made: 0,
+        attempt: 0
+      }
+    }
+    if (playerStats.get(row.player)) {
+      const plStat = playerStats.get(row.player);
+
+      plStat[row.type].attempt++
+      plStat[row.type].made += row.made ? 1 : 0
+      playerStats.set(row.player, plStat)
+    } else {
+      defStat[row.type].attempt++
+      defStat[row.type].made += row.made ? 1 : 0
+
+      playerStats.set(row.player, defStat)
+    }
+    history.push({
+      action: {
+        made: row.made,
+        type: row.type
+      },
+      team,
+      player: playerIsATeam ?? bMap.get(row.player),
+      currentPoint: {
+        a: aPoints,
+        b: bPoints
+      }
+    })
+  }
+
+  for (const [key, value] of playerStats) {
+    console.log(`${combinedMap.get(key)?.name} FG:${value['FG'].made}/${value['FG'].attempt} 3PT:${value['3PT'].made}/${value['3PT'].attempt}`);
+  }
 
   return {
     acknowledge: true,
-    aPlayers: JSON.parse(JSON.stringify(aPlayers)),
-    bPlayers: JSON.parse(JSON.stringify(bPlayers)),
-    aScore: aTeam.score,
-    bScore: bTeam.score,
-    match
+    aTeam,
+    bTeam,
+    match: parsed,
+    history,
+    aPoints,
+    bPoints
   };
 };

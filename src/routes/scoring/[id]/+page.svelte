@@ -18,7 +18,7 @@
 	let history: {
 		team: string;
 		action: Action;
-		player: Player;
+		player: Player | undefined;
 		currentPoint: {
 			a: number;
 			b: number;
@@ -32,15 +32,18 @@
 			...current,
 			title: 'Scoring',
 			button: {
-				label: 'Create',
+				label: 'Submit',
 				action: () => {}
 			},
 			breadcrumbs: [{ href: '#', label: 'test' }]
 		}));
 
-		aPlayers = data.aPlayers || [];
-		bPlayers = data.bPlayers || [];
+		aPlayers = data.aTeam.players || [];
+		bPlayers = data.bTeam.players || [];
 		match = data.match;
+		history = data.history || [];
+		aPoints = data.aPoints ?? 0;
+		bPoints = data.bPoints ?? 0;
 	}
 	init();
 
@@ -51,6 +54,7 @@
 			currAction = null;
 		}
 	}
+	$: reversedHistory = [...history].reverse();
 
 	const classNames = (...classes: string[]) => {
 		return classes.filter(Boolean).join(' ');
@@ -61,6 +65,23 @@
 			action: Action;
 		};
 	}
+
+	const handleCloseMatch = async () => {
+		try {
+			const response = await fetch('/api/scoring', {
+				method: 'POST',
+				body: JSON.stringify({ match_id: match?._id }),
+				headers: {
+					'content-type': 'application/json'
+				}
+			});
+
+			const jsonRes = await response.json();
+			console.log(jsonRes);
+		} catch (error) {
+			console.error('Error submitting form', error);
+		}
+	};
 	const handleActionClicked = ({ detail }: itemProps) => {
 		const { team, action } = detail;
 		openModal = true;
@@ -89,7 +110,7 @@
 		try {
 			const response = await fetch('/api/scoring', {
 				method: 'POST',
-				body: JSON.stringify({ _id: match?._id, }),
+				body: JSON.stringify({ match_id: match?._id, action: currAction, person }),
 				headers: {
 					'content-type': 'application/json'
 				}
@@ -165,10 +186,12 @@
 			</span>
 		</div>
 	</div>
-	<hr class="my-8 border-t border-gray-600 h-0.5" />
 
-	<ActionPairs action={{ value: 1, type: 'FG' }} on:click={handleActionClicked} />
-	<ActionPairs action={{ value: 2, type: '3PT' }} on:click={handleActionClicked} />
+	{#if match?.status != 'archived'}
+		<hr class="my-8 border-t border-gray-600 h-0.5" />
+		<ActionPairs action={{ value: 1, type: 'FG' }} on:click={handleActionClicked} />
+		<ActionPairs action={{ value: 2, type: '3PT' }} on:click={handleActionClicked} />
+	{/if}
 
 	<hr class="my-8 border-t border-gray-600 h-0.5" />
 	<div class="flex justify-evenly items-center shadow-lg">
@@ -215,11 +238,11 @@
 			</div>
 		</div>
 		<div class="my-1">
-			{#each history as { action, team, player, currentPoint }, i}
+			{#each reversedHistory as { action, team, player, currentPoint }}
 				<article class="flex items-center text-sm my-2">
 					<!-- <p class="font-thin mr-4">12:00</p> -->
 					<p class="font-thin w-10">
-						{action.made ? `${currentPoint.a}-${currentPoint.b}` : ''}
+						{action.made && currentPoint ? `${currentPoint?.a}-${currentPoint?.b}` : ''}
 					</p>
 					<span
 						class={classNames(
@@ -232,7 +255,7 @@
 						>
 					</span>
 					<span class={classNames(action.made ? 'font-semibold' : '', 'pl-2 py-1')}>
-						{action.made ? '' : 'Miss'} {player.name} {action.type} Shot</span
+						{action.made ? '' : 'Miss'} {player?.name} {action.type} Shot</span
 					>
 				</article>
 			{/each}
