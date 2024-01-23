@@ -4,10 +4,12 @@
 
 	import ActionPairs from './ActionPairs.svelte';
 	import { navbarStore } from '../../../stores/navbar';
-	import type { NavValue, Player, Action } from '../../../types';
+	import { enhance } from '$app/forms';
+	import type { NavValue, Player, Action, Match } from '../../../types';
 
 	export let data;
 	let players: Player[] = [];
+	let match: (Match & { _id: string }) | null = null;
 	let currTeam: string = '';
 	let currAction: Action | null = null;
 	let aPlayers: Player[] = [];
@@ -38,6 +40,7 @@
 
 		aPlayers = data.aPlayers || [];
 		bPlayers = data.bPlayers || [];
+		match = data.match;
 	}
 	init();
 
@@ -65,7 +68,7 @@
 		currTeam = team;
 		currAction = action;
 	};
-	const handleActionSubmit = (person: Player) => {
+	const handleActionSubmit = async (person: Player) => {
 		if (!currAction) return;
 		if (currAction?.made && currAction?.value) {
 			if (currTeam == 'a') aPoints += currAction?.value;
@@ -83,6 +86,20 @@
 				}
 			}
 		];
+		try {
+			const response = await fetch('/api/scoring', {
+				method: 'POST',
+				body: JSON.stringify({ _id: match?._id, }),
+				headers: {
+					'content-type': 'application/json'
+				}
+			});
+
+			const jsonRes = await response.json();
+			console.log(jsonRes);
+		} catch (error) {
+			console.error('Error submitting form', error);
+		}
 		openModal = false;
 	};
 </script>

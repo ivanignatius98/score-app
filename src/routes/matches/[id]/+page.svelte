@@ -24,8 +24,11 @@
 		navbarStore.update((current: NavValue) => ({
 			...current,
 			title: 'Matches',
-			buttonAction: () => {
-				showSidePanel = true;
+			button: {
+				label:"Create",
+				action: () => {
+					showSidePanel = true;
+				}
 			},
 			breadcrumbs: [{ href: '#', label: 'Series' }]
 		}));

@@ -1,6 +1,10 @@
 import mongoose, { Schema } from 'mongoose';
 
 const StatSchema = new mongoose.Schema({
+  match_id: {
+    type: Schema.Types.ObjectId,
+    ref: 'Matches'
+  },
   player: {
     type: Schema.Types.ObjectId,
     ref: 'User'
