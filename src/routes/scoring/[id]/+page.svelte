@@ -186,10 +186,12 @@
 			</span>
 		</div>
 	</div>
-	<hr class="my-8 border-t border-gray-600 h-0.5" />
 
-	<ActionPairs action={{ value: 1, type: 'FG' }} on:click={handleActionClicked} />
-	<ActionPairs action={{ value: 2, type: '3PT' }} on:click={handleActionClicked} />
+	{#if match?.status != 'archived'}
+		<hr class="my-8 border-t border-gray-600 h-0.5" />
+		<ActionPairs action={{ value: 1, type: 'FG' }} on:click={handleActionClicked} />
+		<ActionPairs action={{ value: 2, type: '3PT' }} on:click={handleActionClicked} />
+	{/if}
 
 	<hr class="my-8 border-t border-gray-600 h-0.5" />
 	<div class="flex justify-evenly items-center shadow-lg">
