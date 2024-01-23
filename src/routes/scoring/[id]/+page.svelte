@@ -167,7 +167,7 @@
 			B
 		</button>
 	</div>
-	<section class=" p-8 bg-gray-700">
+	<section class=" p-4 bg-gray-700">
 		<div class="hidden sm:flex items-center">
 			<div class="flex gap-4 flex-1 justify-center items-center">
 				<span class="bg-red-500 inline-flex items-center justify-center h-12 w-12 rounded-full">
@@ -186,10 +186,21 @@
 				<span class=" font-semibold">Team B</span>
 			</div>
 		</div>
-		<div class="my-2">
+		<div class="my-1">
 			{#each history as row}
 				<article>{row.player.name} {row.action}</article>
 			{/each}
+			<article class="">
+				12:00
+				<span class="bg-red-500 inline-flex items-center justify-center h-12 w-12 rounded-full">
+					<span class="text-lg font-medium leading-none text-white group-hover:text-gray-300"
+						>A</span
+					>
+				</span>
+				test2
+			</article>
+			<article>test</article>
+			<article>test</article>
 		</div>
 	</section>
 </div>
