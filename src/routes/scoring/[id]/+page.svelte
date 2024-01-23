@@ -1,29 +1,29 @@
 <script lang="ts">
 	import Counter from '../../../components/General/Counter.svelte';
 	import Modal from '../../../components/General/Modal.svelte';
+
 	import ActionPairs from './ActionPairs.svelte';
 	import { navbarStore } from '../../../stores/navbar';
-	import type { NavValue, Player } from '../../../types';
+	import { enhance } from '$app/forms';
+	import type { NavValue, Player, Action, Match } from '../../../types';
 
-	// import { seriesStore } from '../../stores/series';
-
-	// const colors = ['red', 'orange', 'yellow'];
-
-	// let active = '';
-
-	// let navValue = { matches: [''] };
-
-	// const unsubscribe = seriesStore.subscribe((value) => {
-	// 	navValue = value;
-	// });
 	export let data;
 	let players: Player[] = [];
+	let match: (Match & { _id: string }) | null = null;
 	let currTeam: string = '';
-	let currAction: string = '';
+	let currAction: Action | null = null;
 	let aPlayers: Player[] = [];
 	let bPlayers: Player[] = [];
 	let openModal = false;
-	let history: { team: string; action: string; player: Player }[] = [];
+	let history: {
+		team: string;
+		action: Action;
+		player: Player;
+		currentPoint: {
+			a: number;
+			b: number;
+		};
+	}[] = [];
 	let aPoints = 0;
 	let bPoints = 0;
 
@@ -31,14 +31,16 @@
 		navbarStore.update((current: NavValue) => ({
 			...current,
 			title: 'Scoring',
-			buttonAction: () => {
-				// showSidePanel = true;
+			button: {
+				label: 'Create',
+				action: () => {}
 			},
 			breadcrumbs: [{ href: '#', label: 'test' }]
 		}));
 
 		aPlayers = data.aPlayers || [];
 		bPlayers = data.bPlayers || [];
+		match = data.match;
 	}
 	init();
 
@@ -46,7 +48,7 @@
 		if (!openModal) {
 			players = [];
 			currTeam = '';
-			currAction = '';
+			currAction = null;
 		}
 	}
 
@@ -56,7 +58,7 @@
 	interface itemProps {
 		detail: {
 			team: string;
-			action: string;
+			action: Action;
 		};
 	}
 	const handleActionClicked = ({ detail }: itemProps) => {
@@ -66,12 +68,38 @@
 		currTeam = team;
 		currAction = action;
 	};
-	const handleActionSubmit = (person: Player) => {
-		if (currAction == '+2') {
-			if (currTeam == 'a') aPoints += 2;
-			else if (currTeam == 'b') bPoints += 2;
+	const handleActionSubmit = async (person: Player) => {
+		if (!currAction) return;
+		if (currAction?.made && currAction?.value) {
+			if (currTeam == 'a') aPoints += currAction?.value;
+			else if (currTeam == 'b') bPoints += currAction?.value;
 		}
-		history = [...history, { team: currTeam, player: person, action: currAction }];
+		history = [
+			...history,
+			{
+				team: currTeam,
+				player: person,
+				action: currAction,
+				currentPoint: {
+					a: aPoints,
+					b: bPoints
+				}
+			}
+		];
+		try {
+			const response = await fetch('/api/scoring', {
+				method: 'POST',
+				body: JSON.stringify({ _id: match?._id, }),
+				headers: {
+					'content-type': 'application/json'
+				}
+			});
+
+			const jsonRes = await response.json();
+			console.log(jsonRes);
+		} catch (error) {
+			console.error('Error submitting form', error);
+		}
 		openModal = false;
 	};
 </script>
@@ -139,8 +167,8 @@
 	</div>
 	<hr class="my-8 border-t border-gray-600 h-0.5" />
 
-	<ActionPairs actionValue="1" on:click={handleActionClicked} />
-	<ActionPairs actionValue="2" on:click={handleActionClicked} />
+	<ActionPairs action={{ value: 1, type: 'FG' }} on:click={handleActionClicked} />
+	<ActionPairs action={{ value: 2, type: '3PT' }} on:click={handleActionClicked} />
 
 	<hr class="my-8 border-t border-gray-600 h-0.5" />
 	<div class="flex justify-evenly items-center shadow-lg">
@@ -167,7 +195,47 @@
 			B
 		</button>
 	</div>
-	{#each history as row}
-		<article>{row.player.name} {row.action}</article>
-	{/each}
+	<section class=" p-4 bg-gray-700">
+		<div class="hidden sm:flex items-center mb-10">
+			<div class="flex gap-4 flex-1 justify-center items-center">
+				<span class="bg-red-500 inline-flex items-center justify-center h-12 w-12 rounded-full">
+					<span class="text-lg font-medium leading-none text-white group-hover:text-gray-300"
+						>A</span
+					>
+				</span>
+				<span class=" font-semibold">Team A</span>
+			</div>
+			<div class="flex gap-4 flex-1 justify-center items-center">
+				<span class="bg-blue-500 inline-flex items-center justify-center h-12 w-12 rounded-full">
+					<span class="text-lg font-medium leading-none text-white group-hover:text-gray-300"
+						>B</span
+					>
+				</span>
+				<span class=" font-semibold">Team B</span>
+			</div>
+		</div>
+		<div class="my-1">
+			{#each history as { action, team, player, currentPoint }, i}
+				<article class="flex items-center text-sm my-2">
+					<!-- <p class="font-thin mr-4">12:00</p> -->
+					<p class="font-thin w-10">
+						{action.made ? `${currentPoint.a}-${currentPoint.b}` : ''}
+					</p>
+					<span
+						class={classNames(
+							team == 'a' ? 'bg-red-500' : 'bg-blue-500',
+							' inline-flex items-center justify-center rounded-full h-8 w-8'
+						)}
+					>
+						<span class="text-md font-medium leading-none text-white group-hover:text-gray-300"
+							>{team.toUpperCase()}</span
+						>
+					</span>
+					<span class={classNames(action.made ? 'font-semibold' : '', 'pl-2 py-1')}>
+						{action.made ? '' : 'Miss'} {player.name} {action.type} Shot</span
+					>
+				</article>
+			{/each}
+		</div>
+	</section>
 </div>
