@@ -9,7 +9,8 @@ const SeriesSchema = new mongoose.Schema({
   }],
   matches: [{
     type: Schema.Types.ObjectId,
-    ref: 'Match'
+    ref: 'Match',
+    default: []
   }],
   createdBy: {
     type: Schema.Types.ObjectId,

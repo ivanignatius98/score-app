@@ -19,13 +19,14 @@
 	let players: Player[] = [];
 	let playerMap = new Map();
 	let showSidePanel = false;
+	let seriesId: string = '';
 
 	function init() {
 		navbarStore.update((current: NavValue) => ({
 			...current,
 			title: 'Matches',
 			button: {
-				label:"Create",
+				label: 'Create',
 				action: () => {
 					showSidePanel = true;
 				}
@@ -41,6 +42,7 @@
 		matches = data.matches || [];
 		players = data.players || [];
 		playerMap = data.playersMap || new Map();
+		seriesId = data.series_id ?? '';
 	}
 	init();
 	//#region teamhandling
@@ -179,7 +181,6 @@
 		use:enhance={({ formData, formElement, cancel }) => {
 			// Before form submission to server
 			// Optimistic UI
-
 			const name = String(formData.get('name'));
 			const arrA = [...teamAIds];
 			const arrB = [...teamBIds];
@@ -234,6 +235,7 @@
 		<div class="divide-y divide-gray-200 px-4 sm:px-6">
 			<div class="space-y-6">
 				<div>
+					<input name="series_id" type="hidden" bind:value={seriesId} />
 					<label for="name" class="block mb-2 text-sm text-white">Match name</label>
 					<input
 						type="text"

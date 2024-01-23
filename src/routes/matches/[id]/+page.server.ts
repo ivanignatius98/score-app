@@ -1,13 +1,16 @@
 import { Types } from 'mongoose';
-import { Series } from '../../../models/Series';
 import { Match } from '../../../models/Match';
 import { User } from '../../../models/User';
+import { Series } from '../../../models/Series';
 import type { Player } from '../../../types';
 
 import type { Actions, Load } from '@sveltejs/kit';
 
 export const load: Load = async ({ params }) => {
-	const series = await Series.findOne({ _id: params.id }).populate('players').lean();
+	const series = await Series.findOne({ _id: params.id })
+		.populate('players')
+		.populate('matches')
+		.lean();
 	if (!series) {
 		return { acknowledge: false, matches: [], players: [] };
 	}
@@ -17,7 +20,8 @@ export const load: Load = async ({ params }) => {
 		acknowledge: true,
 		matches,
 		players,
-		playersMap: dataMap
+		playersMap: dataMap,
+		series_id: series._id.toString()
 	};
 };
 
@@ -26,48 +30,50 @@ export const actions: Actions = {
 		const formData = await request.formData();
 		const data = formData.get('data');
 		const parsed = JSON.parse(data as string);
-		const series = await Series.findOne({ _id: params.id });
+		const series = await Series.findOne({ _id: params.id }).populate("matches");
 		if (!series) return { success: false };
-		console.log(series);
-		console.log(parsed);
-		// const matches = series.matches ? [...series.matches] : [];
+		// console.log(series);
+		let matches = [...series.matches]
+		console.log(matches);
 		let { _id, ...newSave } = parsed;
 
-		const record = new Match(newSave);
-    await record.save()
-		return;
-		// if (_id) {
-		//   _id = new Types.ObjectId(_id)
-		//   const index = matches.findIndex((item) => item._id && item._id.equals(_id));
-		//   if (index !== -1) {
-		//     // Create a new array with the updated item
-		//     const newArray = matches;
-		//     newArray[index] = { ...newArray[index], ...parsed };
-		//     (series as any).matches = newArray
-		//     console.log("newArray", newArray)
-		//   }
-		// } else {
-		//   (series as any).matches = [newSave, ...series.matches]
-		// }
-		(series as any).matches = [newSave._id, ...series.matches];
+		if (_id) {
+			await Match.updateOne({ _id }, newSave)
+			const index = matches.findIndex((item) => item._id && item._id.equals(_id));
+			if (index !== -1) {
+				// Create a new array with the updated item
+				matches[index] = { ...matches[index], ...parsed };
+			}
+		} else {
+			const newRecord = await Match.create(newSave);
+			(series as any).matches = [newRecord._id, ...series.matches]
+			matches = [(newRecord as any), ...matches]
+		}
 
-		const records = await series.save();
+		await series.save();
 		return {
 			success: true,
-			records: JSON.parse(JSON.stringify(records.matches))
+			records: JSON.parse(JSON.stringify(matches))
 		};
-	}
+	},
+	delete: async ({ request, params }) => {
+		const formData = await request.formData();
+		const data = formData.get('data');
+		const parsed = JSON.parse(data as string);
+		await Match.findByIdAndDelete(parsed._id);
+		const series = await Series.findOne({ _id: formData.get('series_id') }).populate("matches")
+		if (!series) {
+			return { success: false }
+		}
+		const indexToDelete = series.matches.findIndex(obj => obj._id.toString() === parsed._id);
+		if (indexToDelete !== -1) {
+			series.matches.splice(indexToDelete, 1);
+		}
+		await series.save()
 
-	// delete: async ({ request }) => {
-	//   const formData = await request.formData();
-	//   const todoId = formData.get('todoId');
-	//   await dbConnect();
-	//   await TodoModel.findByIdAndDelete(todoId);
-	//   await dbDisconnect();
-
-	//   console.log('Todo deleted: ', todoId);
-	//   return {
-	//     success: true,
-	//   };
-	// },
+		return {
+			success: true,
+			records: JSON.parse(JSON.stringify([...series.matches]))
+		};
+	},
 };

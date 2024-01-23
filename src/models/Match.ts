@@ -34,4 +34,4 @@ const MatchSchema = new mongoose.Schema({
   timestamps: true
 });
 
-export const Series = mongoose.model('matches', MatchSchema);
+export const Match = mongoose.model('Match', MatchSchema);
