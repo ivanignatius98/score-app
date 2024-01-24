@@ -81,14 +81,12 @@
 	};
 	const handleDeleteItem = async (_id?: string) => {
 		if (!_id) return;
-		const { success } = await deleteAction(_id);
-		if (success) {
-			const index = history.findIndex((item) => item._id === _id);
-			if (index !== -1) {
-				history.splice(index, 1);
-				history = [...history];
-			}
+		const index = history.findIndex((item) => item._id === _id);
+		if (index !== -1) {
+			history.splice(index, 1);
+			history = [...history];
 		}
+		deleteAction(_id);
 	};
 	const handleActionClicked = ({ detail }: itemProps) => {
 		const { team, action } = detail;
@@ -109,7 +107,7 @@
 				action: currAction
 			}
 		];
-
+		openModal = false;
 		const { success, record } = await saveAction({
 			match_id: match?._id,
 			action: currAction,
@@ -118,7 +116,6 @@
 		if (success) {
 			history[history.length - 1]._id = record._id;
 		}
-		openModal = false;
 	};
 
 	let pointsArr: { a: number; b: number }[] = [];
