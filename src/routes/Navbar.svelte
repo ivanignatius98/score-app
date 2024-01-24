@@ -20,7 +20,7 @@
 
 <div class="mb-5">
 	<div>
-		<nav class="sm:hidden" aria-label="Back">
+		<nav class="" aria-label="Back">
 			<button
 				on:click={goBack}
 				class="flex items-center text-sm font-medium text-gray-400 hover:text-gray-200"
@@ -40,7 +40,7 @@
 				Back
 			</button>
 		</nav>
-		<nav class="hidden sm:flex" aria-label="Breadcrumb">
+		<!-- <nav class="hidden sm:flex" aria-label="Breadcrumb">
 			<ol role="list" class="flex items-center space-x-4">
 				{#each navValue.breadcrumbs as row, i}
 					{#if i == 0}
@@ -77,7 +77,7 @@
 					{/if}
 				{/each}
 			</ol>
-		</nav>
+		</nav> -->
 	</div>
 	<div class="mt-2 sm:flex sm:items-center sm:justify-between">
 		<div class="flex-1 min-w-0">

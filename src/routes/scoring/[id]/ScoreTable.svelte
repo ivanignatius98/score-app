@@ -3,7 +3,6 @@
 
 	export let data: (StatMap & { player: Player })[] = [];
 	const roundToOneDec = (val: number) => {
-		console.log((Math.round(val * 10) / 10).toString());
 		return (Math.round(val * 10) / 10).toString() + (Number.isInteger(val) ? '.0' : '');
 	};
 </script>
