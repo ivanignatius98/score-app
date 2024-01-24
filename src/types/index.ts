@@ -36,6 +36,7 @@ export interface NavValue {
     action: () => void
   }
   breadcrumbs: { href: string; label: string }[];
+  backNav: string
 }
 
 export interface Action {
