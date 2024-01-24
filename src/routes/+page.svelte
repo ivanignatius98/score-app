@@ -295,7 +295,7 @@
 																type="button"
 																class={classNames(
 																	playerIdsTmp.has(person._id) ? 'bg-green-700' : '',
-																	'ring-1 ring-green-700 py-1 px-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant min-w-[100px]'
+																	'ring-1 ring-green-700 p-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant min-w-[100px]'
 																)}
 															>
 																Select{playerIdsTmp.has(person._id) ? 'ed' : ''}

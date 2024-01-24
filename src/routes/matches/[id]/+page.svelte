@@ -217,6 +217,7 @@
 				matches = newArray;
 			}
 			formData.append('data', JSON.stringify(newMatchToSave));
+			showSidePanel = false;
 			isLoading = true;
 			return async ({ update, result }) => {
 				if (result.status == 200 && result.type == 'success') {
@@ -226,7 +227,6 @@
 				}
 				await update();
 				isLoading = false;
-				showSidePanel = false;
 			};
 		}}
 		slot="content"
@@ -293,7 +293,7 @@
 																type="button"
 																class={classNames(
 																	teamAIds.has(person._id) ? 'bg-green-700' : '',
-																	'ring-1 ring-green-700 py-1 px-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant '
+																	'ring-1 ring-green-700 p-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant '
 																)}
 															>
 																Team A
@@ -303,7 +303,7 @@
 																type="button"
 																class={classNames(
 																	teamBIds.has(person._id) ? 'bg-green-700' : '',
-																	'ring-1 ring-green-700 py-1 px-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant '
+																	'ring-1 ring-green-700 p-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant '
 																)}
 															>
 																Team B

@@ -237,14 +237,14 @@
 				Team B
 			</button>
 		</div>
-		<div class="grid grid-cols-2 gap-2 p-4">
+		<div class="grid grid-cols-2 gap-4 p-4">
 			{#each players as person}
 				<button
 					type="button"
 					on:click={() => {
 						handleActionSubmit(person);
 					}}
-					class=" ring-1 ring-green-700 py-1 px-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant"
+					class=" ring-1 ring-green-700 p-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant"
 				>
 					{person.name}
 				</button>
