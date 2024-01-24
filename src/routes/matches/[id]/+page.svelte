@@ -217,7 +217,7 @@
 				matches = newArray;
 			}
 			formData.append('data', JSON.stringify(newMatchToSave));
-			showSidePanel = false;
+
 			isLoading = true;
 			return async ({ update, result }) => {
 				if (result.status == 200 && result.type == 'success') {
@@ -227,6 +227,7 @@
 				}
 				await update();
 				isLoading = false;
+				showSidePanel = false;
 			};
 		}}
 		slot="content"
@@ -373,7 +374,7 @@
 			<button
 				disabled={isLoading}
 				type="submit"
-				class="flex-1 justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+				class="flex-1 disabled:bg-indigo-300 justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
 			>
 				Save
 			</button>
