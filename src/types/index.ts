@@ -44,3 +44,10 @@ export interface Action {
   value?: number;
   type: string
 }
+
+export interface StatMap {
+  [key: string]: {
+    made: number;
+    attempt: number;
+  };
+}
