@@ -32,9 +32,7 @@ export const actions: Actions = {
 		const parsed = JSON.parse(data as string);
 		const series = await Series.findOne({ _id: params.id }).populate("matches");
 		if (!series) return { success: false };
-		// console.log(series);
 		let matches = [...series.matches]
-		console.log(matches);
 		let { _id, ...newSave } = parsed;
 
 		if (_id) {

@@ -4,8 +4,8 @@
 
 	import ActionPairs from './ActionPairs.svelte';
 	import { navbarStore } from '../../../stores/navbar';
-	import { enhance } from '$app/forms';
 	import type { NavValue, Player, Action, Match } from '../../../types';
+	import { deleteAction, saveAction, updateMatchStatus } from '../../../services/scoring/index.js';
 
 	export let data;
 	let players: Player[] = [];
@@ -16,34 +16,30 @@
 	let bPlayers: Player[] = [];
 	let openModal = false;
 	let history: {
+		_id?: string;
 		team: string;
 		action: Action;
 		player: Player | undefined;
-		currentPoint: {
-			a: number;
-			b: number;
-		};
 	}[] = [];
 	let aPoints = 0;
 	let bPoints = 0;
 
 	function init() {
-		navbarStore.update((current: NavValue) => ({
-			...current,
-			title: 'Scoring',
-			button: {
-				label: 'Submit',
-				action: () => {}
-			},
-			breadcrumbs: [{ href: '#', label: 'test' }]
-		}));
-
 		aPlayers = data.aTeam.players || [];
 		bPlayers = data.bTeam.players || [];
 		match = data.match;
 		history = data.history || [];
-		aPoints = data.aPoints ?? 0;
-		bPoints = data.bPoints ?? 0;
+		navbarStore.update((current: NavValue) => ({
+			...current,
+			title: 'Scoring',
+			button: {
+				label: data.match.status == 'archived' ? 'Reopen' : 'Submit',
+				action: () => {
+					handleCloseMatch();
+				}
+			},
+			backNav: '/matches/' + data.series._id
+		}));
 	}
 	init();
 
@@ -67,19 +63,31 @@
 	}
 
 	const handleCloseMatch = async () => {
-		try {
-			const response = await fetch('/api/scoring', {
-				method: 'POST',
-				body: JSON.stringify({ match_id: match?._id }),
-				headers: {
-					'content-type': 'application/json'
-				}
-			});
+		if (!match?._id) return;
+		const { success, res } = await updateMatchStatus(match?._id);
+		if (success && match) {
+			match.status = res;
 
-			const jsonRes = await response.json();
-			console.log(jsonRes);
-		} catch (error) {
-			console.error('Error submitting form', error);
+			navbarStore.update((current: NavValue) => ({
+				...current,
+				button: {
+					label: res == 'archived' ? 'Reopen' : 'Submit',
+					action: () => {
+						handleCloseMatch();
+					}
+				}
+			}));
+		}
+	};
+	const handleDeleteItem = async (_id?: string) => {
+		if (!_id) return;
+		const { success } = await deleteAction(_id);
+		if (success) {
+			const index = history.findIndex((item) => item._id === _id);
+			if (index !== -1) {
+				history.splice(index, 1);
+				history = [...history];
+			}
 		}
 	};
 	const handleActionClicked = ({ detail }: itemProps) => {
@@ -89,40 +97,58 @@
 		currTeam = team;
 		currAction = action;
 	};
+
 	const handleActionSubmit = async (person: Player) => {
 		if (!currAction) return;
-		if (currAction?.made && currAction?.value) {
-			if (currTeam == 'a') aPoints += currAction?.value;
-			else if (currTeam == 'b') bPoints += currAction?.value;
-		}
+
 		history = [
 			...history,
 			{
 				team: currTeam,
 				player: person,
-				action: currAction,
-				currentPoint: {
-					a: aPoints,
-					b: bPoints
-				}
+				action: currAction
 			}
 		];
-		try {
-			const response = await fetch('/api/scoring', {
-				method: 'POST',
-				body: JSON.stringify({ match_id: match?._id, action: currAction, person }),
-				headers: {
-					'content-type': 'application/json'
-				}
-			});
 
-			const jsonRes = await response.json();
-			console.log(jsonRes);
-		} catch (error) {
-			console.error('Error submitting form', error);
+		const { success, record } = await saveAction({
+			match_id: match?._id,
+			action: currAction,
+			person
+		});
+		if (success) {
+			history[history.length - 1]._id = record._id;
 		}
 		openModal = false;
 	};
+
+	let pointsArr: { a: number; b: number }[] = [];
+	$: {
+		let aPt = 0;
+		let bPt = 0;
+		const tempArr = [];
+
+		for (let row of history) {
+			if (!data.typeValues) break;
+
+			const val = data.typeValues.get(row.action.type);
+
+			if (row.action.made && val) {
+				if (row.team === 'a') {
+					aPt += val;
+				} else if (row.team === 'b') {
+					bPt += val;
+				}
+			}
+			tempArr.push({
+				a: aPt,
+				b: bPt
+			});
+		}
+		aPoints = aPt;
+		bPoints = bPt;
+		pointsArr = [...tempArr];
+	}
+	$: reversedPoints = [...pointsArr].reverse();
 </script>
 
 <Modal title="Edit your details" bind:openModal>
@@ -189,12 +215,15 @@
 
 	{#if match?.status != 'archived'}
 		<hr class="my-8 border-t border-gray-600 h-0.5" />
-		<ActionPairs action={{ value: 1, type: 'FG' }} on:click={handleActionClicked} />
-		<ActionPairs action={{ value: 2, type: '3PT' }} on:click={handleActionClicked} />
+		<div class="px-4">
+			<ActionPairs action={{ value: 1, type: 'FG' }} on:click={handleActionClicked} />
+			<ActionPairs action={{ value: 2, type: '3PT' }} on:click={handleActionClicked} />
+		</div>
+
+		<hr class="mt-8 border-t border-gray-600 h-0.5" />
 	{/if}
 
-	<hr class="my-8 border-t border-gray-600 h-0.5" />
-	<div class=" bg-gray-700 rounded-sm">
+	<div class=" bg-gray-700 rounded-sm mt-8">
 		<div class="flex justify-evenly items-center shadow-lg">
 			<button
 				on:click={() => {}}
@@ -239,11 +268,13 @@
 				</div>
 			</div>
 			<div class="my-1">
-				{#each reversedHistory as { action, team, player, currentPoint }}
-					<article class="flex items-center text-sm my-2">
+				{#each reversedHistory as { action, team, player, _id }, i}
+					<article class="flex items-center text-sm my-2 relative">
 						<!-- <p class="font-thin mr-4">12:00</p> -->
 						<p class="font-thin w-10">
-							{action.made && currentPoint ? `${currentPoint?.a}-${currentPoint?.b}` : ''}
+							{action.made && reversedPoints[i]
+								? `${reversedPoints[i]?.a}-${reversedPoints[i]?.b}`
+								: ''}
 						</p>
 						<span
 							class={classNames(
@@ -258,6 +289,24 @@
 						<span class={classNames(action.made ? 'font-semibold' : '', 'pl-2 py-1')}>
 							{action.made ? '' : 'Miss'} {player?.name} {action.type} Shot</span
 						>
+						{#if match?.status != 'archived'}
+							<button
+								class="absolute right-0 w-10 hover:bg-slate-800 active:bg-slate-800 rounded-full p-2"
+								on:click={() => handleDeleteItem(_id)}
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke-width="1.5"
+									stroke="currentColor"
+									aria-hidden="true"
+									class="oc se"
+									><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"
+									></path></svg
+								>
+							</button>
+						{/if}
 					</article>
 				{/each}
 			</div>
