@@ -4,10 +4,12 @@
 
 	import ActionPairs from './ActionPairs.svelte';
 	import { navbarStore } from '../../../stores/navbar';
-	import type { NavValue, Player, Action, Match } from '../../../types';
+	import type { NavValue, Player, Action, Match, StatMap } from '../../../types';
 	import { deleteAction, saveAction, updateMatchStatus } from '../../../services/scoring/index.js';
+	import ScoreTable from './ScoreTable.svelte';
 
 	export let data;
+
 	let players: Player[] = [];
 	let match: (Match & { _id: string }) | null = null;
 	let currTeam: string = '';
@@ -23,12 +25,17 @@
 	}[] = [];
 	let aPoints = 0;
 	let bPoints = 0;
+	let arrA: (StatMap & { player: Player })[] = [];
+	let arrB: (StatMap & { player: Player })[] = [];
 
+	let currTab = 'playbyplay';
 	function init() {
 		aPlayers = data.aTeam.players || [];
 		bPlayers = data.bTeam.players || [];
 		match = data.match;
 		history = data.history || [];
+		currTab = match?.status == 'archived' ? 'teamA' : 'playbyplay';
+
 		navbarStore.update((current: NavValue) => ({
 			...current,
 			title: 'Scoring',
@@ -40,7 +47,51 @@
 			},
 			backNav: '/matches/' + data.series._id
 		}));
+		let playerStats = new Map();
+
+		// count stats
+		for (let row of history) {
+			const defaultStat: StatMap = {
+				FG: {
+					made: 0,
+					attempt: 0
+				},
+				'3PT': {
+					made: 0,
+					attempt: 0
+				}
+			};
+			if (!row.player) {
+				return;
+			}
+			if (playerStats.get(row.player._id)) {
+				const plStat = playerStats.get(row.player._id);
+
+				plStat[row.action.type].attempt++;
+				plStat[row.action.type].made += row.action.made ? 1 : 0;
+				playerStats.set(row.player._id, plStat);
+			} else {
+				defaultStat[row.action.type].attempt++;
+				defaultStat[row.action.type].made += row.action.made ? 1 : 0;
+
+				playerStats.set(row.player._id, { ...defaultStat, player: row.player });
+			}
+		}
+
+		if (!data.aMap || !data.bMap) return;
+
+		let temp = [];
+		for (let [key] of data.aMap) {
+			temp.push(playerStats.get(key));
+		}
+		arrA = [...temp];
+		temp = [];
+		for (let [key] of data.bMap) {
+			temp.push(playerStats.get(key));
+		}
+		arrB = [...temp];
 	}
+
 	init();
 
 	$: {
@@ -64,7 +115,13 @@
 
 	const handleCloseMatch = async () => {
 		if (!match?._id) return;
+
+		const newStatus = match.status == 'archived' ? 'upcoming' : 'archived';
+		match.status = newStatus;
+		currTab = newStatus == 'archived' ? 'teamA' : 'playbyplay';
+
 		const { success, res } = await updateMatchStatus(match?._id);
+
 		if (success && match) {
 			match.status = res;
 
@@ -146,6 +203,8 @@
 		pointsArr = [...tempArr];
 	}
 	$: reversedPoints = [...pointsArr].reverse();
+
+	$: postGame = match?.status == 'archived';
 </script>
 
 <Modal title="Edit your details" bind:openModal>
@@ -210,7 +269,7 @@
 		</div>
 	</div>
 
-	{#if match?.status != 'archived'}
+	{#if !postGame}
 		<hr class="my-8 border-t border-gray-600 h-0.5" />
 		<div class="px-4">
 			<ActionPairs action={{ value: 1, type: 'FG' }} on:click={handleActionClicked} />
@@ -222,91 +281,115 @@
 
 	<div class=" bg-gray-700 rounded-sm mt-8">
 		<div class="flex justify-evenly items-center shadow-lg">
+			{#if postGame}
+				<button
+					on:click={() => {
+						currTab = 'teamA';
+					}}
+					type="button"
+					class={classNames(
+						currTab == 'teamA' ? 'bg-gray-900' : 'hover:bg-gray-900',
+						'flex flex-1 justify-center text-sm font-semibold py-3 px-4 items-center border border-transparent rounded-sm text-white bg-transparant'
+					)}
+				>
+					Team A
+				</button>
+				<button
+					on:click={() => {
+						currTab = 'teamB';
+					}}
+					type="button"
+					class={classNames(
+						currTab == 'teamB' ? 'bg-gray-900' : 'hover:bg-gray-900',
+						'flex flex-1 justify-center text-sm font-semibold py-3 px-4 items-center border border-transparent rounded-sm text-white bg-transparant'
+					)}
+				>
+					Team B
+				</button>
+			{/if}
 			<button
-				on:click={() => {}}
+				on:click={() => {
+					currTab = 'playbyplay';
+				}}
 				type="button"
-				class="bg-gray-900 flex flex-1 justify-center text-sm font-semibold py-3 px-4 items-center border border-transparent rounded-sm text-white bg-transparant"
+				class={classNames(
+					currTab == 'playbyplay' ? 'bg-gray-900' : 'hover:bg-gray-900',
+					'flex flex-1 justify-center text-sm font-semibold py-3 px-4 items-center border border-transparent rounded-sm text-white bg-transparant'
+				)}
 			>
-				History
-			</button>
-
-			<button
-				on:click={() => {}}
-				type="button"
-				class="hover:bg-gray-900 flex flex-1 justify-center text-sm font-semibold bg-gray-700 py-3 px-4 items-center border border-transparent rounded-sm text-white bg-transparant"
-			>
-				A
-			</button>
-			<button
-				on:click={() => {}}
-				type="button"
-				class="hover:bg-gray-900 flex flex-1 justify-center text-sm font-semibold bg-gray-700 py-3 px-4 items-center border border-transparent rounded-sm text-white bg-transparant"
-			>
-				B
+				{postGame ? 'History' : 'Play by Play'}
 			</button>
 		</div>
 		<section class="p-4">
-			<div class="hidden sm:flex items-center mb-10">
-				<div class="flex gap-4 flex-1 justify-center items-center">
-					<span class="bg-red-500 inline-flex items-center justify-center h-12 w-12 rounded-full">
-						<span class="text-lg font-medium leading-none text-white group-hover:text-gray-300"
-							>A</span
-						>
-					</span>
-					<span class=" font-semibold">Team A</span>
-				</div>
-				<div class="flex gap-4 flex-1 justify-center items-center">
-					<span class="bg-blue-500 inline-flex items-center justify-center h-12 w-12 rounded-full">
-						<span class="text-lg font-medium leading-none text-white group-hover:text-gray-300"
-							>B</span
-						>
-					</span>
-					<span class=" font-semibold">Team B</span>
-				</div>
-			</div>
-			<div class="my-1">
-				{#each reversedHistory as { action, team, player, _id }, i}
-					<article class="flex items-center text-sm my-2 relative">
-						<!-- <p class="font-thin mr-4">12:00</p> -->
-						<p class="font-thin w-10">
-							{action.made && reversedPoints[i]
-								? `${reversedPoints[i]?.a}-${reversedPoints[i]?.b}`
-								: ''}
-						</p>
-						<span
-							class={classNames(
-								team == 'a' ? 'bg-red-500' : 'bg-blue-500',
-								' inline-flex items-center justify-center rounded-full h-8 w-8'
-							)}
-						>
-							<span class="text-md font-medium leading-none text-white group-hover:text-gray-300"
-								>{team.toUpperCase()}</span
+			{#if currTab == 'playbyplay'}
+				<div class="hidden sm:flex items-center mb-10">
+					<div class="flex gap-4 flex-1 justify-center items-center">
+						<span class="bg-red-500 inline-flex items-center justify-center h-12 w-12 rounded-full">
+							<span class="text-lg font-medium leading-none text-white group-hover:text-gray-300"
+								>A</span
 							>
 						</span>
-						<span class={classNames(action.made ? 'font-semibold' : '', 'pl-2 py-1')}>
-							{action.made ? '' : 'Miss'} {player?.name} {action.type} Shot</span
+						<span class=" font-semibold">Team A</span>
+					</div>
+					<div class="flex gap-4 flex-1 justify-center items-center">
+						<span
+							class="bg-blue-500 inline-flex items-center justify-center h-12 w-12 rounded-full"
 						>
-						{#if match?.status != 'archived'}
-							<button
-								class="absolute right-0 w-10 hover:bg-slate-800 active:bg-slate-800 rounded-full p-2"
-								on:click={() => handleDeleteItem(_id)}
+							<span class="text-lg font-medium leading-none text-white group-hover:text-gray-300"
+								>B</span
 							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke-width="1.5"
-									stroke="currentColor"
-									aria-hidden="true"
-									class="oc se"
-									><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"
-									></path></svg
+						</span>
+						<span class=" font-semibold">Team B</span>
+					</div>
+				</div>
+				<div class="my-1">
+					{#each reversedHistory as { action, team, player, _id }, i}
+						<article class="flex items-center text-sm my-2 relative">
+							<!-- <p class="font-thin mr-4">12:00</p> -->
+							<p class="font-thin w-10">
+								{action.made && reversedPoints[i]
+									? `${reversedPoints[i]?.a}-${reversedPoints[i]?.b}`
+									: ''}
+							</p>
+							<span
+								class={classNames(
+									team == 'a' ? 'bg-red-500' : 'bg-blue-500',
+									' inline-flex items-center justify-center rounded-full h-8 w-8'
+								)}
+							>
+								<span class="text-md font-medium leading-none text-white group-hover:text-gray-300"
+									>{team.toUpperCase()}</span
 								>
-							</button>
-						{/if}
-					</article>
-				{/each}
-			</div>
+							</span>
+							<span class={classNames(action.made ? 'font-semibold' : '', 'pl-2 py-1')}>
+								{action.made ? '' : 'Miss'} {player?.name} {action.type} Shot</span
+							>
+							{#if match?.status != 'archived'}
+								<button
+									class="absolute right-0 w-10 hover:bg-slate-800 active:bg-slate-800 rounded-full p-2"
+									on:click={() => handleDeleteItem(_id)}
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke-width="1.5"
+										stroke="currentColor"
+										aria-hidden="true"
+										class="oc se"
+										><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"
+										></path></svg
+									>
+								</button>
+							{/if}
+						</article>
+					{/each}
+				</div>
+			{:else if currTab == 'teamA'}
+				<ScoreTable bind:data={arrA} />
+			{:else if currTab == 'teamB'}
+				<ScoreTable bind:data={arrB} />
+			{/if}
 		</section>
 	</div>
 </div>
