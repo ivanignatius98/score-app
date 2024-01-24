@@ -170,7 +170,7 @@
 		</div>
 	</div>
 </Modal>
-<div class="max-w-xl w-full self-center bg-gray-800 p-12">
+<div class="max-w-xl w-full self-center bg-gray-800 pt-12 px-0 sm:p-12 rounded-md">
 	<div class="flex items-center justify-center gap-5">
 		<div>
 			<span class="bg-red-500 inline-flex items-center justify-center h-12 w-12 rounded-full">
@@ -194,71 +194,73 @@
 	{/if}
 
 	<hr class="my-8 border-t border-gray-600 h-0.5" />
-	<div class="flex justify-evenly items-center shadow-lg">
-		<button
-			on:click={() => {}}
-			type="button"
-			class="bg-gray-900 flex flex-1 justify-center text-sm font-semibold py-3 px-4 items-center border border-transparent rounded-sm text-white bg-transparant"
-		>
-			History
-		</button>
+	<div class=" bg-gray-700 rounded-sm">
+		<div class="flex justify-evenly items-center shadow-lg">
+			<button
+				on:click={() => {}}
+				type="button"
+				class="bg-gray-900 flex flex-1 justify-center text-sm font-semibold py-3 px-4 items-center border border-transparent rounded-sm text-white bg-transparant"
+			>
+				History
+			</button>
 
-		<button
-			on:click={() => {}}
-			type="button"
-			class="hover:bg-gray-900 flex flex-1 justify-center text-sm font-semibold bg-gray-700 py-3 px-4 items-center border border-transparent rounded-sm text-white bg-transparant"
-		>
-			A
-		</button>
-		<button
-			on:click={() => {}}
-			type="button"
-			class="hover:bg-gray-900 flex flex-1 justify-center text-sm font-semibold bg-gray-700 py-3 px-4 items-center border border-transparent rounded-sm text-white bg-transparant"
-		>
-			B
-		</button>
-	</div>
-	<section class=" p-4 bg-gray-700">
-		<div class="hidden sm:flex items-center mb-10">
-			<div class="flex gap-4 flex-1 justify-center items-center">
-				<span class="bg-red-500 inline-flex items-center justify-center h-12 w-12 rounded-full">
-					<span class="text-lg font-medium leading-none text-white group-hover:text-gray-300"
-						>A</span
-					>
-				</span>
-				<span class=" font-semibold">Team A</span>
-			</div>
-			<div class="flex gap-4 flex-1 justify-center items-center">
-				<span class="bg-blue-500 inline-flex items-center justify-center h-12 w-12 rounded-full">
-					<span class="text-lg font-medium leading-none text-white group-hover:text-gray-300"
-						>B</span
-					>
-				</span>
-				<span class=" font-semibold">Team B</span>
-			</div>
+			<button
+				on:click={() => {}}
+				type="button"
+				class="hover:bg-gray-900 flex flex-1 justify-center text-sm font-semibold bg-gray-700 py-3 px-4 items-center border border-transparent rounded-sm text-white bg-transparant"
+			>
+				A
+			</button>
+			<button
+				on:click={() => {}}
+				type="button"
+				class="hover:bg-gray-900 flex flex-1 justify-center text-sm font-semibold bg-gray-700 py-3 px-4 items-center border border-transparent rounded-sm text-white bg-transparant"
+			>
+				B
+			</button>
 		</div>
-		<div class="my-1">
-			{#each reversedHistory as { action, team, player, currentPoint }}
-				<article class="flex items-center text-sm my-2">
-					<!-- <p class="font-thin mr-4">12:00</p> -->
-					<p class="font-thin w-10">
-						{action.made && currentPoint ? `${currentPoint?.a}-${currentPoint?.b}` : ''}
-					</p>
-					<span
-						class={classNames(
-							team == 'a' ? 'bg-red-500' : 'bg-blue-500',
-							' inline-flex items-center justify-center rounded-full h-8 w-8'
-						)}
-					>
-						<span class="text-md font-medium leading-none text-white group-hover:text-gray-300"
-							>{team.toUpperCase()}</span
+		<section class="p-4">
+			<div class="hidden sm:flex items-center mb-10">
+				<div class="flex gap-4 flex-1 justify-center items-center">
+					<span class="bg-red-500 inline-flex items-center justify-center h-12 w-12 rounded-full">
+						<span class="text-lg font-medium leading-none text-white group-hover:text-gray-300"
+							>A</span
 						>
 					</span>
-					<span class={classNames(action.made ? 'font-semibold' : '', 'pl-2 py-1')}>
-						{action.made ? '' : 'Miss'} {player?.name} {action.type} Shot</span
-					>
-				</article>
-			{/each}
-		</div>
-	</section>
+					<span class=" font-semibold">Team A</span>
+				</div>
+				<div class="flex gap-4 flex-1 justify-center items-center">
+					<span class="bg-blue-500 inline-flex items-center justify-center h-12 w-12 rounded-full">
+						<span class="text-lg font-medium leading-none text-white group-hover:text-gray-300"
+							>B</span
+						>
+					</span>
+					<span class=" font-semibold">Team B</span>
+				</div>
+			</div>
+			<div class="my-1">
+				{#each reversedHistory as { action, team, player, currentPoint }}
+					<article class="flex items-center text-sm my-2">
+						<!-- <p class="font-thin mr-4">12:00</p> -->
+						<p class="font-thin w-10">
+							{action.made && currentPoint ? `${currentPoint?.a}-${currentPoint?.b}` : ''}
+						</p>
+						<span
+							class={classNames(
+								team == 'a' ? 'bg-red-500' : 'bg-blue-500',
+								' inline-flex items-center justify-center rounded-full h-8 w-8'
+							)}
+						>
+							<span class="text-md font-medium leading-none text-white group-hover:text-gray-300"
+								>{team.toUpperCase()}</span
+							>
+						</span>
+						<span class={classNames(action.made ? 'font-semibold' : '', 'pl-2 py-1')}>
+							{action.made ? '' : 'Miss'} {player?.name} {action.type} Shot</span
+						>
+					</article>
+				{/each}
+			</div>
+		</section>
+	</div>
 </div>
