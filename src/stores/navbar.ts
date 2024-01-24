@@ -7,6 +7,7 @@ interface NavValue {
     action: () => void
   }
   breadcrumbs: { href: string; label: string }[];
+  backNav: string
 }
 
 const initialState: NavValue = {
@@ -15,7 +16,8 @@ const initialState: NavValue = {
     label: "Create",
     action: () => { }
   },
-  breadcrumbs: []
+  breadcrumbs: [],
+  backNav: "#"
 };
 
 export const navbarStore = writable(initialState);

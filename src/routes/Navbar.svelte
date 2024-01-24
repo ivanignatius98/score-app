@@ -5,7 +5,8 @@
 	let navValue: NavValue = {
 		title: '',
 		button: { label: 'Create', action: () => {} },
-		breadcrumbs: []
+		breadcrumbs: [],
+		backNav: '#'
 	};
 
 	navbarStore.subscribe((value) => {
@@ -13,8 +14,7 @@
 	});
 
 	const goBack = () => {
-		const ref = document.referrer;
-		goto(ref.length > 0 ? ref : '/');
+		goto(navValue.backNav);
 	};
 </script>
 
@@ -91,7 +91,7 @@
 				type="button"
 				class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500"
 			>
-				Create
+				{navValue.button.label}
 			</button>
 		</div>
 	</div>

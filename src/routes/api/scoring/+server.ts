@@ -1,4 +1,5 @@
 import { json } from '@sveltejs/kit';
+import { Match } from "../../../models/Match.js";
 import { Stat } from "../../../models/Stat.js";
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request }) {
@@ -10,7 +11,18 @@ export async function POST({ request }) {
 		type: action.type,
 		made: action.made
 	}
-	await Stat.create(populatePayload)
+	const newRecord = await Stat.create(populatePayload)
 
-	return json(true);
+	return json({
+		success: true,
+		record: newRecord
+	});
+}
+
+export async function DELETE({ request }) {
+	const { _id } = await request.json();
+	await Stat.findOneAndDelete({ _id })
+	return json({
+		success: true
+	});
 }
