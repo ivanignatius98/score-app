@@ -22,7 +22,7 @@
 							class="m-auto flex h-full flex-col overflow-y-auto bg-gray-900 shadow-xl"
 						>
 							<div class="bg-indigo-700">
-								<div class="px-4 sm:px-6 py-6 mt-1">
+								<div class="px-4 sm:px-6 py-5 mt-1">
 									<div class="flex items-start justify-between ">
 										<h2 class="text-lg font-medium text-white">{title}</h2>
 										<div class="ml-3 flex h-7 items-center">

@@ -11,7 +11,7 @@ export interface MatchTeam {
 }
 
 export interface Match {
-  name: string;
+  number: number;
   status: string;
   aTeam: MatchTeam;
   bTeam: MatchTeam;
