@@ -48,7 +48,6 @@ export const actions: Actions = {
 		if (!series) return { success: false };
 		let matches = [...series.matches]
 		let { _id, ...newSave } = parsed;
-
 		if (_id) {
 			await Match.updateOne({ _id }, newSave)
 			const index = matches.findIndex((item) => item._id && item._id.equals(_id));
@@ -63,6 +62,7 @@ export const actions: Actions = {
 		}
 
 		await series.save();
+
 		return {
 			success: true,
 			records: JSON.parse(JSON.stringify(matches))

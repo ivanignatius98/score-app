@@ -163,7 +163,11 @@
 		{#each matches as match}
 			<li>
 				<ListItem
-					item={{ ...match, desc: new Date(match.createdAt).toDateString() }}
+					item={{
+						...match,
+						name: `Match ${match.number}`,
+						desc: new Date(match.createdAt).toDateString()
+					}}
 					on:itemClicked={handleItemClicked}
 				/>
 			</li>

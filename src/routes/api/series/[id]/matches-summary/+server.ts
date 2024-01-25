@@ -66,12 +66,15 @@ export async function GET({ request, params }) {
     const threeperc = value['3PT'].attempt == 0
       ? '0.0'
       : roundToOneDec((value['3PT'].made / value['3PT'].attempt) * 100)
+
+    const pts = (value['FG'].made + (value['3PT'].made * 2))
     arr.push({
       player: value.player,
       "FG": fg,
       "FG%": fgperc,
       "3PT": three,
-      "3PT%": threeperc
+      "3PT%": threeperc,
+      "PTS": pts
     })
   }
   console.table(arr)
