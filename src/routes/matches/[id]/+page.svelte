@@ -73,6 +73,7 @@
 			teamBIds = new Set();
 			number = matches.length + 1;
 			selectedId = '';
+			showDropdown = false;
 		}
 	}
 

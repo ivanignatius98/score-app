@@ -47,6 +47,11 @@
 			},
 			backNav: '/matches/' + data.series._id
 		}));
+	}
+
+	init();
+
+	const handleGenerateStats = () => {
 		let playerStats = new Map();
 
 		// count stats
@@ -78,21 +83,24 @@
 			}
 		}
 
+		const getArr = (val: Map<string, Player>) => {
+			const temp = [];
+			for (let [key] of val) {
+				const stat = playerStats.get(key);
+				if (stat) temp.push(stat);
+			}
+			return temp;
+		};
 		if (!data.aMap || !data.bMap) return;
+		arrA = getArr(data.aMap);
+		arrB = getArr(data.bMap);
+	};
 
-		let temp = [];
-		for (let [key] of data.aMap) {
-			temp.push(playerStats.get(key));
+	$: {
+		if (match && match.status == 'archived') {
+			handleGenerateStats();
 		}
-		arrA = [...temp];
-		temp = [];
-		for (let [key] of data.bMap) {
-			temp.push(playerStats.get(key));
-		}
-		arrB = [...temp];
 	}
-
-	init();
 
 	$: {
 		if (!openModal) {
