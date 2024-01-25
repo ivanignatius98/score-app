@@ -8,6 +8,7 @@
 	import type { Match, NavValue, Player } from '../../../types';
 	import { Types } from 'mongoose';
 	import Dropdown from '../../../components/General/Dropdown.svelte';
+	import { matchSummary } from '../../../services/series/index.ts';
 
 	export let data;
 	let name = '';
@@ -45,6 +46,10 @@
 		seriesId = data.series_id ?? '';
 	}
 	init();
+
+	const handleGetSummary = async (val: string) => {
+		const summary = await matchSummary(val);
+	};
 	//#region teamhandling
 	const classNames = (...classes: string[]) => {
 		return classes.filter(Boolean).join(' ');
@@ -168,6 +173,9 @@
 <div class="mt-6">
 	<button
 		type="button"
+		on:click={() => {
+			handleGetSummary(seriesId);
+		}}
 		class="w-full flex justify-center items-center px-4 py-2 shadow-sm text-sm font-medium rounded-md text-white bg-white bg-opacity-10 hover:bg-opacity-20"
 	>
 		View all
