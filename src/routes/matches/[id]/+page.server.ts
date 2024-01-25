@@ -15,11 +15,25 @@ export const load: Load = async ({ params }) => {
 		return { acknowledge: false, matches: [], players: [] };
 	}
 	const { matches, players } = JSON.parse(JSON.stringify(series));
+	const sortedPlayers = players.sort((a: any, b: any) => {
+		// Convert names to lowercase for case-insensitive sorting
+		const nameA = a.name.toLowerCase();
+		const nameB = b.name.toLowerCase();
+		// Compare names and return the result
+		if (nameA < nameB) {
+			return -1;
+		}
+		if (nameA > nameB) {
+			return 1;
+		}
+		return 0;
+	});
+	const sortedMatches = matches.sort((a: any, b: any) => b.number - a.number);
 	const dataMap = new Map(players.map((item: Player) => [item._id, item.name]));
 	return {
 		acknowledge: true,
-		matches,
-		players,
+		matches: sortedMatches,
+		players: sortedPlayers,
 		playersMap: dataMap,
 		series_id: series._id.toString()
 	};
@@ -34,7 +48,6 @@ export const actions: Actions = {
 		if (!series) return { success: false };
 		let matches = [...series.matches]
 		let { _id, ...newSave } = parsed;
-
 		if (_id) {
 			await Match.updateOne({ _id }, newSave)
 			const index = matches.findIndex((item) => item._id && item._id.equals(_id));
@@ -49,6 +62,7 @@ export const actions: Actions = {
 		}
 
 		await series.save();
+
 		return {
 			success: true,
 			records: JSON.parse(JSON.stringify(matches))

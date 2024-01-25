@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
 const MatchSchema = new mongoose.Schema({
-  name: String,
+  number: Number,
   status: {
     type: String,
     enum: ['live', 'archived', 'upcoming'],

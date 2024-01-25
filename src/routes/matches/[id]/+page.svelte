@@ -8,9 +8,10 @@
 	import type { Match, NavValue, Player } from '../../../types';
 	import { Types } from 'mongoose';
 	import Dropdown from '../../../components/General/Dropdown.svelte';
+	import { matchSummary } from '../../../services/series/index.ts';
 
 	export let data;
-	let name = '';
+	let number = -1;
 	let selectedId: string = '';
 	let isLoading = false;
 	let showDropdown = false;
@@ -45,6 +46,10 @@
 		seriesId = data.series_id ?? '';
 	}
 	init();
+
+	const handleGetSummary = async (val: string) => {
+		const summary = await matchSummary(val);
+	};
 	//#region teamhandling
 	const classNames = (...classes: string[]) => {
 		return classes.filter(Boolean).join(' ');
@@ -66,7 +71,7 @@
 			teamAIds = new Set();
 			teamB = [];
 			teamBIds = new Set();
-			name = 'Match ' + (matches.length + 1);
+			number = matches.length + 1;
 			selectedId = '';
 		}
 	}
@@ -148,7 +153,7 @@
 		teamAIds = new Set([...aTeam.players]);
 		teamBIds = new Set([...bTeam.players]);
 		showSidePanel = true;
-		name = detail.name;
+		number = detail.number;
 	};
 	//#endregion
 </script>
@@ -158,7 +163,11 @@
 		{#each matches as match}
 			<li>
 				<ListItem
-					item={{ ...match, desc: new Date(match.createdAt).toDateString() }}
+					item={{
+						...match,
+						name: `Match ${match.number}`,
+						desc: new Date(match.createdAt).toDateString()
+					}}
 					on:itemClicked={handleItemClicked}
 				/>
 			</li>
@@ -168,6 +177,9 @@
 <div class="mt-6">
 	<button
 		type="button"
+		on:click={() => {
+			handleGetSummary(seriesId);
+		}}
 		class="w-full flex justify-center items-center px-4 py-2 shadow-sm text-sm font-medium rounded-md text-white bg-white bg-opacity-10 hover:bg-opacity-20"
 	>
 		View all
@@ -181,14 +193,14 @@
 		use:enhance={({ formData, formElement, cancel }) => {
 			// Before form submission to server
 			// Optimistic UI
-			const name = String(formData.get('name'));
+			const number = Number(formData.get('number'));
 			const arrA = [...teamAIds];
 			const arrB = [...teamBIds];
 			const aIds = arrA.map((row) => new Types.ObjectId(row));
 			const bIds = arrB.map((row) => new Types.ObjectId(row));
 			const newMatchToSave = {
 				_id: '',
-				name,
+				number,
 				status: 'upcoming',
 				aTeam: { players: aIds, score: 0 },
 				bTeam: { players: bIds, score: 0 },
@@ -233,138 +245,171 @@
 		slot="content"
 		class="flex flex-1 flex-col justify-between h-full"
 	>
-		<div class="divide-y divide-gray-200 px-4 sm:px-6">
+		<div class="divide-y divide-gray-200 px-4 sm:px-6 overflow-y-auto">
 			<div class="space-y-6">
 				<div>
 					<input name="series_id" type="hidden" bind:value={seriesId} />
-					<label for="name" class="block mb-2 text-sm text-white">Match name</label>
-					<input
-						type="text"
-						name="name"
-						bind:value={name}
-						class="border text-sm rounded-md block w-full py-2 px-3 bg-gray-800 border-gray-600 placeholder-gray-500 focus:border-indigo-500 text-gray-400"
-						placeholder="Match 1"
-						required
-					/>
-				</div>
-				<div>
-					<h3 class="text-sm font-medium text-white">Team A Members</h3>
-					<div class="mt-2">
-						<div class="flex gap-1">
-							{#each teamA as person}
-								<button class="group" on:click={() => handleAddTeam('a', person)} type="button">
-									<span
-										class="bg-blue-500 group-hover:bg-blue-700 inline-flex items-center justify-center h-8 w-8 rounded-full"
-									>
-										<span
-											class="text-sm font-medium leading-none text-white group-hover:text-gray-300"
-											>{person?.initials}</span
-										>
-									</span>
-								</button>
-							{/each}
-							<button
-								on:click={() => (openModal = true)}
-								type="button"
-								class="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 border-dashed border-gray-700 bg-gray-800 text-gray-600 hover:border-gray-600 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-							>
-								<span class="sr-only">Add team member</span>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									viewBox="0 0 20 20"
-									fill="currentColor"
-									aria-hidden="true"
-									class="nz sb"
-									><path
-										d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z"
-									></path></svg
-								>
-							</button>
-							<Modal title="Edit your details" bind:openModal>
-								<div slot="content">
-									<div class="overflow-y-auto overflow-x-hidden max-h-64">
-										<ul role="list" class="-my-4 text-sm py-8">
-											{#each players as person}
-												<li class="py-3 px-8 rounded-md">
-													<div class="flex justify-between items-center">
-														{person.name}
-														<div class="flex gap-2">
-															<button
-																on:click={() => handleAddTeam('a', person)}
-																type="button"
-																class={classNames(
-																	teamAIds.has(person._id) ? 'bg-green-700' : '',
-																	'ring-1 ring-green-700 p-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant '
-																)}
-															>
-																Team A
-															</button>
-															<button
-																on:click={() => handleAddTeam('b', person)}
-																type="button"
-																class={classNames(
-																	teamBIds.has(person._id) ? 'bg-green-700' : '',
-																	'ring-1 ring-green-700 p-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant '
-																)}
-															>
-																Team B
-															</button>
-														</div>
-													</div>
-												</li>
-											{/each}
-										</ul>
-									</div>
-									<div class="p-6 border-t-[1px] border-slate-700">
-										<button
-											on:click={() => {
-												openModal = false;
-											}}
-											class="p-2 bg-blue-500 w-full rounded-md text-sm disabled:bg-blue-300"
-											type="button"
-										>
-											Dismiss
-										</button>
-									</div>
-								</div>
-							</Modal>
+					<label for="number" class="block mb-2 text-sm text-white">Match Number</label>
+					<div class="flex">
+						<div
+							class="flex rounded-md shadow-sm border border-gray-800 bg-gray-800 focus-within:border-indigo-600"
+						>
+							<span class="inline-flex items-center pl-3 rounded-l-md text-gray-500 text-sm">
+								Match
+							</span>
+							<input
+								type="number"
+								name="number"
+								bind:value={number}
+								class="w-10 text-sm rounded-r-md block py-2 px-2 bg-gray-800 text-gray-400 focus:outline-none"
+								placeholder="1"
+								required
+							/>
 						</div>
 					</div>
 				</div>
-				<div>
-					<h3 class="text-sm font-medium text-white">Team B Members</h3>
-					<div class="mt-2">
-						<div class="flex gap-1">
-							{#each teamB as person}
-								<button class="group" on:click={() => handleAddTeam('b', person)} type="button">
-									<span
-										class="bg-red-500 group-hover:bg-red-700 inline-flex items-center justify-center h-8 w-8 rounded-full"
-									>
-										<span
-											class="text-sm font-medium leading-none text-white group-hover:text-gray-300"
-											>{person?.initials}</span
-										>
-									</span>
-								</button>
-							{/each}
+				<Modal title="Assign Teams" bind:openModal>
+					<div slot="content">
+						<div class="overflow-y-auto overflow-x-hidden max-h-80">
+							<ul role="list" class="-my-4 text-sm py-8">
+								{#each players as person}
+									<li class="py-3 px-8 rounded-md">
+										<div class="flex justify-between items-center">
+											{person.name}
+											<div class="flex gap-2">
+												<button
+													on:click={() => handleAddTeam('a', person)}
+													type="button"
+													class={classNames(
+														teamAIds.has(person._id) ? 'bg-green-700' : '',
+														'ring-1 ring-green-700 p-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant '
+													)}
+												>
+													Team A
+												</button>
+												<button
+													on:click={() => handleAddTeam('b', person)}
+													type="button"
+													class={classNames(
+														teamBIds.has(person._id) ? 'bg-green-700' : '',
+														'ring-1 ring-green-700 p-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant '
+													)}
+												>
+													Team B
+												</button>
+											</div>
+										</div>
+									</li>
+								{/each}
+							</ul>
+						</div>
+						<div class="p-6 border-t-[1px] border-slate-700">
 							<button
-								on:click={() => (openModal = true)}
+								on:click={() => {
+									openModal = false;
+								}}
+								class="p-2 bg-blue-500 w-full rounded-md text-sm disabled:bg-blue-300"
 								type="button"
-								class="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 border-dashed border-gray-700 bg-gray-800 text-gray-600 hover:border-gray-600 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
 							>
-								<span class="sr-only">Add team member</span>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									viewBox="0 0 20 20"
-									fill="currentColor"
-									aria-hidden="true"
-									class="nz sb"
-									><path
-										d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z"
-									></path></svg
-								>
+								Dismiss
 							</button>
 						</div>
+					</div>
+				</Modal>
+				<div class="text-sm">
+					<h3 class="font-medium">Team A Members</h3>
+					<div class="mt-2">
+						<ul role="list">
+							{#each teamA as person}
+								<li
+									class="box-border border-[1px] first:border-b-0 border-x-0 border-solid border-gray-700 py-3"
+								>
+									<div class="flex items-center">
+										<div class="flex-grow">
+											<!-- Content for the first div (takes up max space) -->
+											<span
+												class="bg-blue-500 group-hover:bg-blue-700 inline-flex items-center justify-center h-8 w-8 rounded-full mr-2"
+											>
+												<span
+													class="text-sm font-medium leading-none text-white group-hover:text-gray-300"
+													>{person?.initials}</span
+												>
+											</span>
+											{person?.name}
+										</div>
+										<button
+											class="text-sm font-medium hover:opacity-90 text-indigo-400"
+											on:click|preventDefault={() => {
+												handleAddTeam('a', person);
+											}}
+										>
+											Remove
+										</button>
+									</div>
+								</li>
+							{/each}
+						</ul>
+					</div>
+				</div>
+				<div class="text-sm">
+					<h3 class="font-medium">Team B Members</h3>
+					<div class="mt-2">
+						<ul role="list">
+							{#each teamB as person}
+								<li
+									class="box-border border-[1px] first:border-b-0 last:border-t-0 border-x-0 border-solid border-gray-700 py-3"
+								>
+									<div class="flex items-center">
+										<div class="flex-grow">
+											<span
+												class="bg-red-500 group-hover:bg-red-700 inline-flex items-center justify-center h-8 w-8 rounded-full mr-2"
+											>
+												<span
+													class="text-sm font-medium leading-none text-white group-hover:text-gray-300"
+													>{person?.initials}</span
+												>
+											</span>
+											{person?.name}
+										</div>
+										<button
+											class="text-sm font-medium hover:opacity-90 text-indigo-400"
+											on:click|preventDefault={() => {
+												handleAddTeam('b', person);
+											}}
+										>
+											Remove
+										</button>
+									</div>
+								</li>
+							{/each}
+							<li
+								class=" box-border border-[1px] first:border-b-0 last:border-t-0 border-x-0 border-solid border-gray-700 py-3"
+							>
+								<button
+									class="group flex items-center gap-3"
+									on:click={() => (openModal = true)}
+									type="button"
+								>
+									<div
+										class="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 border-dashed border-gray-700 bg-gray-800 text-gray-600 group-hover:border-gray-600 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+									>
+										<span class="sr-only">Add team member</span>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											viewBox="0 0 20 20"
+											fill="currentColor"
+											aria-hidden="true"
+											class="nz sb"
+											><path
+												d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z"
+											></path></svg
+										>
+									</div>
+									<span class="text-sm font-medium group-hover:opacity-90 text-indigo-400">Add</span
+									>
+								</button>
+							</li>
+						</ul>
 					</div>
 				</div>
 			</div>
@@ -431,3 +476,9 @@
 		</div>
 	</form>
 </SlideOver>
+
+<style>
+	input[type='number']::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+	}
+</style>

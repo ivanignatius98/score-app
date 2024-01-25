@@ -45,29 +45,6 @@ export const load: Load = async ({ params }) => {
   for (let row of parsedStats) {
     const playerIsATeam = aMap.get(row.player)
     const team = playerIsATeam ? "a" : "b"
-
-    // const defStat = {
-    //   "FG": {
-    //     made: 0,
-    //     attempt: 0
-    //   },
-    //   "3PT": {
-    //     made: 0,
-    //     attempt: 0
-    //   }
-    // }
-    // if (playerStats.get(row.player)) {
-    //   const plStat = playerStats.get(row.player);
-
-    //   plStat[row.type].attempt++
-    //   plStat[row.type].made += row.made ? 1 : 0
-    //   playerStats.set(row.player, plStat)
-    // } else {
-    //   defStat[row.type].attempt++
-    //   defStat[row.type].made += row.made ? 1 : 0
-
-    //   playerStats.set(row.player, defStat)
-    // }
     history.push({
       _id: row._id,
       action: {
@@ -79,9 +56,6 @@ export const load: Load = async ({ params }) => {
     })
   }
 
-  // for (const [key, value] of playerStats) {
-  //   console.log(`${combinedMap.get(key)?.name} FG:${value['FG'].made}/${value['FG'].attempt} 3PT:${value['3PT'].made}/${value['3PT'].attempt}`);
-  // }
   return {
     acknowledge: true,
     aTeam,
@@ -93,6 +67,6 @@ export const load: Load = async ({ params }) => {
     aPoints,
     bPoints,
     typeValues,
-    series:JSON.parse(JSON.stringify(series))
+    series: JSON.parse(JSON.stringify(series))
   };
 };
