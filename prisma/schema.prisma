@@ -17,8 +17,8 @@ model Series {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  players   User[]
-  matches   Match[]
+  seriesUser  SeriesUser[]
+  matches     Match[]
 }
 
 enum MatchStatus {
@@ -74,12 +74,22 @@ model Stat {
 }
 
 
+model SeriesUser {
+  id        Int     @id @default(autoincrement())
+
+  seriesId  String
+  series    Series  @relation(fields: [seriesId], references: [id])
+
+  playerId  String
+  player    User   @relation(fields: [playerId], references: [id])
+}
+
 model User {
   id          String  @id @default(uuid())
   email       String?
   name        String?
 
-  series      Series[]
   matchPlayer MatchPlayer[]
+  seriesUser  SeriesUser[]
   stat        Stat[]
 }
