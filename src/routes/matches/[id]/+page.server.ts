@@ -12,45 +12,62 @@ export const load: Load = async ({ params }) => {
 		select: {
 			player: {
 				select: {
+					id: true,
 					name: true
 				}
 			}
 		},
 		where: {
 			seriesId: params.id
+		},
+		orderBy: {
+			player: {
+				name: 'asc'
+			}
 		}
 	});
 
-	console.log(seriesUsers);
-	const series = await Series.findOne({ _id: params.id })
-		.populate('players')
-		.populate('matches')
-		.lean();
-	if (!series) {
-		return { acknowledge: false, matches: [], players: [] };
-	}
-	const { matches, players } = JSON.parse(JSON.stringify(series));
-	const sortedPlayers = players.sort((a: any, b: any) => {
-		// Convert names to lowercase for case-insensitive sorting
-		const nameA = a.name.toLowerCase();
-		const nameB = b.name.toLowerCase();
-		// Compare names and return the result
-		if (nameA < nameB) {
-			return -1;
+	const matches = await prisma.match.findMany({
+		select: {
+			id: true,
+			number: true,
+			status: true,
+			createdAt: true
+		},
+		where: {
+			seriesId: params.id
+		},
+		orderBy: {
+			number: 'desc'
 		}
-		if (nameA > nameB) {
-			return 1;
-		}
-		return 0;
 	});
-	const sortedMatches = matches.sort((a: any, b: any) => b.number - a.number);
-	const dataMap = new Map(players.map((item: Player) => [item._id, item.name]));
+
+	const dataMap = new Map();
+
+	const players = seriesUsers.map(({ player }) => {
+		dataMap.set(player.id, player.name);
+		return player;
+	});
+
+	const matchPlayers = await prisma.matchPlayer.findMany({
+		select: {
+			team: true,
+			matchId: true,
+			playerId: true
+		},
+		where: {
+			matchId: {
+				in: matches.map(({ id }) => id)
+			}
+		}
+	});
+
 	return {
 		acknowledge: true,
-		matches: sortedMatches,
-		players: sortedPlayers,
+		matches,
+		players,
 		playersMap: dataMap,
-		series_id: series._id.toString()
+		series_id: params.id
 	};
 };
 
