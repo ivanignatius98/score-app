@@ -14,7 +14,7 @@
 
 	export let data;
 
-	let series: (Series & { _id?: string })[] = [];
+	let series: (Series & { id?: string })[] = [];
 	let members: Player[] = [];
 	let selectedId = '';
 	let playerq = '';
@@ -37,7 +37,6 @@
 			},
 			breadcrumbs: [{ href: '#', label: 'test' }]
 		}));
-
 		series = data.series || [];
 		members = data.members || [];
 
@@ -75,19 +74,18 @@
 
 	interface TeamItem extends Player {
 		initials: string;
-		colorClass: string;
+		colorClass?: string;
 	}
 	let playersTmp: TeamItem[] = [];
-	let playerIdsTmp: Set<Types.ObjectId> = new Set();
+	let playerIdsTmp: Set<String> = new Set();
 	let players: TeamItem[] = [];
-	let playerIds: Set<Types.ObjectId> = new Set();
+	let playerIds: Set<String> = new Set();
 
 	const handleAddPlayer = async (person: Player, skipTmp?: Boolean) => {
-		const stringId = person._id;
 		const initials = getInitials(person.name);
-		if (playerIdsTmp.has(stringId)) {
-			playerIdsTmp.delete(stringId);
-			const foundIndex = playersTmp.findIndex((obj) => obj._id === person._id);
+		if (playerIdsTmp.has(person.id)) {
+			playerIdsTmp.delete(person.id);
+			const foundIndex = playersTmp.findIndex((obj) => obj.id === person.id);
 			if (foundIndex !== -1) {
 				const temp = [...playersTmp];
 				temp.splice(foundIndex, 1);
@@ -95,7 +93,7 @@
 				playerIdsTmp = new Set([...playerIdsTmp]);
 			}
 		} else {
-			playerIdsTmp = new Set([...playerIdsTmp, stringId]);
+			playerIdsTmp = new Set([...playerIdsTmp, person.id]);
 			playersTmp = [...playersTmp, { ...person, initials, colorClass: 'bg-red-500' }];
 		}
 
@@ -107,23 +105,14 @@
 	//#endregion
 
 	interface itemProps {
-		detail: Series & { _id: string };
+		detail: Series & { id: string };
 	}
 	const handleItemClicked = ({ detail }: itemProps) => {
-		selectedId = detail._id;
+		selectedId = detail.id;
 		name = detail.name;
-		seriesDate = detail.date ? detail.date.split('T')[0] : formattedDate;
-		const ids: Types.ObjectId[] = [];
-		players = detail.players.map(({ _id, name }) => {
-			ids.push(_id);
-			return {
-				_id: _id,
-				name: name,
-				initials: getInitials(name),
-				colorClass: 'bg-red-500'
-			};
-		});
-		playerIds = new Set([...ids]);
+		seriesDate = new Date(detail.date).toISOString().split('T')[0];
+		players = [...detail.players];
+		playerIds = new Set([...detail.playerIds]);
 		playersTmp = [...players];
 		playerIdsTmp = new Set([...playerIds]);
 		showSidePanel = true;
@@ -131,6 +120,7 @@
 </script>
 
 <div class="flow-root mt-6">
+	<!-- {JSON.stringify(series)} -->
 	<ul role="list" class="-my-5 divide-y divide-gray-800">
 		{#each series as row}
 			<li>
@@ -162,31 +152,29 @@
 		use:enhance={({ formData, formElement, cancel }) => {
 			const name = String(formData.get('name'));
 			const arrPlayers = [...players];
-			const arrIdPlayers = arrPlayers.map(({ _id }) => new Types.ObjectId(_id));
+			const arrIdPlayers = [...playerIds];
 			const newSeries = {
-				_id: '',
+				id: '',
 				name,
 				players: arrIdPlayers,
-				date: seriesDate,
-				createdBy: new Types.ObjectId('6565fcf005ac129c4a659284'),
-				createdAt: new Date(),
-				updatedAt: new Date()
+				date: seriesDate
 			};
 			const newSeriesItem = {
 				...newSeries,
 				players: arrPlayers,
+				playerIds: arrIdPlayers,
 				matches: []
 			};
 			if (selectedId == '') {
 				series = [newSeriesItem, ...series];
 			} else {
-				const index = series.findIndex((item) => item._id === selectedId);
+				const index = series.findIndex((item) => item.id === selectedId);
 				if (index == -1) {
 					cancel();
 					return;
 				}
-				newSeries._id = selectedId || '';
-				newSeriesItem._id = selectedId || '';
+				newSeries.id = selectedId || '';
+				newSeriesItem.id = selectedId || '';
 				// Create a new array with the updated item
 				const newArray = [...series];
 				newArray[index] = { ...newArray[index], ...newSeriesItem };
@@ -287,6 +275,8 @@
 												<li class="py-3 px-8 rounded-md">
 													<div class="flex justify-between items-center">
 														{person.name}
+														{person.id}
+														{JSON.stringify(playerIdsTmp)}
 														<div class="flex gap-2">
 															<button
 																on:click={() => {
@@ -294,11 +284,11 @@
 																}}
 																type="button"
 																class={classNames(
-																	playerIdsTmp.has(person._id) ? 'bg-green-700' : '',
+																	playerIdsTmp.has(person.id) ? 'bg-green-700' : '',
 																	'ring-1 ring-green-700 p-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant min-w-[100px]'
 																)}
 															>
-																Select{playerIdsTmp.has(person._id) ? 'ed' : ''}
+																Select{playerIdsTmp.has(person.id) ? 'ed' : ''}
 															</button>
 														</div>
 													</div>

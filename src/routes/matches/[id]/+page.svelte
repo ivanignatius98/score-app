@@ -16,7 +16,7 @@
 	let isLoading = false;
 	let showDropdown = false;
 
-	let matches: (Match & { _id?: string })[] = [];
+	let matches: (Match & { id?: string })[] = [];
 	let players: Player[] = [];
 	let playerMap = new Map();
 	let showSidePanel = false;
@@ -56,14 +56,14 @@
 	};
 
 	interface TeamItem extends Player {
-		initials: string;
+		initials?: string;
 	}
 
 	let openModal = false;
 	let teamA: TeamItem[] = [];
-	let teamAIds: Set<Types.ObjectId> = new Set();
+	let teamAIds: Set<string> = new Set();
 	let teamB: TeamItem[] = [];
-	let teamBIds: Set<Types.ObjectId> = new Set();
+	let teamBIds: Set<string> = new Set();
 
 	$: {
 		if (!showSidePanel) {
@@ -78,7 +78,6 @@
 	}
 
 	const handleAddTeam = async (team: string, person: Player) => {
-		const stringId = person._id;
 		const initials = getInitials(person.name);
 
 		let [arr1, set1, arr2, set2] =
@@ -87,9 +86,9 @@
 		if (!arr1 || !set1) return;
 		if (!arr2 || !set2) return;
 
-		if (set1.has(stringId)) {
-			set1.delete(stringId);
-			const foundIndex = arr1.findIndex((obj) => obj._id === person._id);
+		if (set1.has(person.id)) {
+			set1.delete(person.id);
+			const foundIndex = arr1.findIndex((obj) => obj.id === person.id);
 			if (foundIndex !== -1) {
 				const temp = [...arr1];
 				temp.splice(foundIndex, 1);
@@ -98,14 +97,14 @@
 			}
 		} else {
 			if (arr1.length < 5) {
-				set1 = new Set([...set1, stringId]);
+				set1 = new Set([...set1, person.id]);
 				arr1 = [...arr1, { ...person, initials }];
 			}
 		}
 
-		if (set2.has(stringId)) {
-			set2.delete(stringId);
-			const foundIndex = arr2.findIndex((obj) => obj._id === person._id);
+		if (set2.has(person.id)) {
+			set2.delete(person.id);
+			const foundIndex = arr2.findIndex((obj) => obj.id === person.id);
 			if (foundIndex !== -1) {
 				const temp = [...arr2];
 				temp.splice(foundIndex, 1);
@@ -129,30 +128,16 @@
 	//#endregion
 	//#region open detail
 	interface itemProps {
-		detail: Match & { _id: string };
+		detail: Match & { id: string };
 	}
 	const handleItemClicked = ({ detail }: itemProps) => {
-		selectedId = detail._id;
+		selectedId = detail.id;
 		const { aTeam, bTeam } = detail;
-		teamA = aTeam.players.map((_id) => {
-			const name = playerMap.get(_id) || '';
-			return {
-				_id,
-				name,
-				initials: getInitials(name)
-			};
-		});
-		teamB = bTeam.players.map((_id) => {
-			const name = playerMap.get(_id) || '';
-			return {
-				_id,
-				name,
-				initials: getInitials(name)
-			};
-		});
+		teamA = [...aTeam.players];
+		teamB = [...bTeam.players];
 
-		teamAIds = new Set([...aTeam.players]);
-		teamBIds = new Set([...bTeam.players]);
+		teamAIds = aTeam.ids;
+		teamBIds = bTeam.ids;
 		showSidePanel = true;
 		number = detail.number;
 	};
@@ -195,53 +180,53 @@
 			// Before form submission to server
 			// Optimistic UI
 			const number = Number(formData.get('number'));
-			const arrA = [...teamAIds];
-			const arrB = [...teamBIds];
-			const aIds = arrA.map((row) => new Types.ObjectId(row));
-			const bIds = arrB.map((row) => new Types.ObjectId(row));
-			const newMatchToSave = {
-				_id: '',
-				number,
-				status: 'upcoming',
-				aTeam: { players: aIds, score: 0 },
-				bTeam: { players: bIds, score: 0 },
-				createdBy: new Types.ObjectId('6565fcf005ac129c4a659284'),
-				createdAt: new Date(),
-				updatedAt: new Date()
-			};
-			const newMatchItem = {
-				...newMatchToSave,
-				aTeam: { players: arrA, score: 0 },
-				bTeam: { players: arrB, score: 0 }
-			};
-			if (selectedId == '') {
-				matches = [newMatchItem, ...matches];
-			} else {
-				const index = matches.findIndex((item) => item._id === selectedId);
-				if (index == -1) {
-					cancel();
-					return;
-				}
-				newMatchToSave._id = selectedId || '';
-				newMatchItem._id = selectedId || '';
-				// Create a new array with the updated item
-				const newArray = [...matches];
-				newArray[index] = { ...newArray[index], ...newMatchItem };
-				matches = newArray;
-			}
-			formData.append('data', JSON.stringify(newMatchToSave));
+			// const arrA = [...teamAIds];
+			// const arrB = [...teamBIds];
+			// const aIds = arrA.map((row) => new string(row));
+			// const bIds = arrB.map((row) => new string(row));
+			// const newMatchToSave = {
+			// 	_id: '',
+			// 	number,
+			// 	status: 'upcoming',
+			// 	aTeam: { players: aIds, score: 0 },
+			// 	bTeam: { players: bIds, score: 0 },
+			// 	createdBy: new string('6565fcf005ac129c4a659284'),
+			// 	createdAt: new Date(),
+			// 	updatedAt: new Date()
+			// };
+			// const newMatchItem = {
+			// 	...newMatchToSave,
+			// 	aTeam: { players: arrA, score: 0 },
+			// 	bTeam: { players: arrB, score: 0 }
+			// };
+			// if (selectedId == '') {
+			// 	matches = [newMatchItem, ...matches];
+			// } else {
+			// 	const index = matches.findIndex((item) => item._id === selectedId);
+			// 	if (index == -1) {
+			// 		cancel();
+			// 		return;
+			// 	}
+			// 	newMatchToSave._id = selectedId || '';
+			// 	newMatchItem._id = selectedId || '';
+			// 	// Create a new array with the updated item
+			// 	const newArray = [...matches];
+			// 	newArray[index] = { ...newArray[index], ...newMatchItem };
+			// 	matches = newArray;
+			// }
+			// formData.append('data', JSON.stringify(newMatchToSave));
 
-			isLoading = true;
-			return async ({ update, result }) => {
-				if (result.status == 200 && result.type == 'success') {
-					if (result.data && Array.isArray(result.data.records)) {
-						matches = result.data.records;
-					}
-				}
-				await update();
-				isLoading = false;
-				showSidePanel = false;
-			};
+			// isLoading = true;
+			// return async ({ update, result }) => {
+			// 	if (result.status == 200 && result.type == 'success') {
+			// 		if (result.data && Array.isArray(result.data.records)) {
+			// 			matches = result.data.records;
+			// 		}
+			// 	}
+			// 	await update();
+			// 	isLoading = false;
+			// 	showSidePanel = false;
+			// };
 		}}
 		slot="content"
 		class="flex flex-1 flex-col justify-between h-full"
@@ -282,7 +267,7 @@
 													on:click={() => handleAddTeam('a', person)}
 													type="button"
 													class={classNames(
-														teamAIds.has(person._id) ? 'bg-green-700' : '',
+														teamAIds.has(person.id) ? 'bg-green-700' : '',
 														'ring-1 ring-green-700 p-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant '
 													)}
 												>
@@ -292,7 +277,7 @@
 													on:click={() => handleAddTeam('b', person)}
 													type="button"
 													class={classNames(
-														teamBIds.has(person._id) ? 'bg-green-700' : '',
+														teamBIds.has(person.id) ? 'bg-green-700' : '',
 														'ring-1 ring-green-700 p-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant '
 													)}
 												>

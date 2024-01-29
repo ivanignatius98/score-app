@@ -1,9 +1,9 @@
 {
 	"name": "score-app",
 	"version": "0.0.1",
-  "prisma": {
-    "seed": "ts-node prisma/seed.ts"
-  },
+	"prisma": {
+		"seed": "ts-node prisma/seed.ts"
+	},
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
