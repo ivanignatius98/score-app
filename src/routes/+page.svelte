@@ -185,7 +185,7 @@
 			return async ({ update, result }) => {
 				if (result.status == 200 && result.type == 'success') {
 					if (result.data && Array.isArray(result.data.records)) {
-						series = result.data.records;
+						series[0].id = result.data.id;
 					}
 				}
 				isLoading = false;

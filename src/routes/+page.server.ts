@@ -114,16 +114,14 @@ export const actions: Actions = {
 						date: new Date(newSave.date)
 					}
 				});
-				console.log(created);
 				id = created.id;
 			}
 
-			const createMany = await prisma.seriesUser.createMany({
+			await prisma.seriesUser.createMany({
 				data: newSave.players.map((row: string) => ({ seriesId: id, playerId: row })),
 				skipDuplicates: true
 			});
-			console.log(createMany);
-			return { success: true };
+			return { success: true, id };
 		} catch (error) {
 			console.error(error);
 		}
