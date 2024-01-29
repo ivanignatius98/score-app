@@ -9,6 +9,7 @@
 	import { Types } from 'mongoose';
 	import Dropdown from '../../../components/General/Dropdown.svelte';
 	import { matchSummary } from '../../../services/series/index.ts';
+	import { goto } from '$app/navigation';
 
 	export let data;
 	let number = -1;
@@ -170,7 +171,20 @@
 						desc: new Date(match.createdAt).toDateString()
 					}}
 					on:itemClicked={handleItemClicked}
-				/>
+				>
+					<span slot="additional-view">
+						<span
+							class={classNames(
+								' bg-opacity-10  text-opacity-100 ring-1  ring-opacity-20 ring-inset ml-3 inline-block py-1 px-2 text-xs font-medium rounded-md',
+								match.status == 'archived'
+									? 'bg-green-500 text-green-500 ring-green-500'
+									: 'bg-yellow-500 text-yellow-500 ring-yellow-500'
+							)}
+						>
+							{match.status}
+						</span>
+					</span>
+				</ListItem>
 			</li>
 		{/each}
 	</ul>
@@ -199,10 +213,11 @@
 			const arrB = [...teamBIds];
 			const aIds = arrA.map((row) => new Types.ObjectId(row));
 			const bIds = arrB.map((row) => new Types.ObjectId(row));
+
 			const newMatchToSave = {
 				_id: '',
 				number,
-				status: 'upcoming',
+				status: 'live',
 				aTeam: { players: aIds, score: 0 },
 				bTeam: { players: bIds, score: 0 },
 				createdBy: new Types.ObjectId('6565fcf005ac129c4a659284'),
@@ -214,6 +229,7 @@
 				aTeam: { players: arrA, score: 0 },
 				bTeam: { players: arrB, score: 0 }
 			};
+
 			if (selectedId == '') {
 				matches = [newMatchItem, ...matches];
 			} else {
@@ -222,6 +238,8 @@
 					cancel();
 					return;
 				}
+				newMatchItem.status = matches[index].status;
+				newMatchToSave.status = matches[index].status;
 				newMatchToSave._id = selectedId || '';
 				newMatchItem._id = selectedId || '';
 				// Create a new array with the updated item
@@ -233,14 +251,18 @@
 
 			isLoading = true;
 			return async ({ update, result }) => {
+				let redir = '';
 				if (result.status == 200 && result.type == 'success') {
 					if (result.data && Array.isArray(result.data.records)) {
 						matches = result.data.records;
+						if (typeof result.data.newId === 'string') redir = result.data.newId;
 					}
 				}
 				await update();
 				isLoading = false;
 				showSidePanel = false;
+
+				if (redir) goto('/scoring/' + redir);
 			};
 		}}
 		slot="content"
@@ -422,7 +444,7 @@
 				type="submit"
 				class="flex-1 disabled:bg-indigo-300 justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
 			>
-				Save
+				Save and Score
 			</button>
 			<!-- <button
 				type="button"
@@ -458,18 +480,18 @@
 						class="origin-bottom-right absolute z-10 right-0 bottom-14 mt-2 w-32 bg-gray-800 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
 						tabindex="-1"
 					>
-						<a
+						<!-- <a
 							href={`/scoring/${selectedId}`}
 							class="block px-4 py-2 text-sm hover:bg-gray-700 rounded-t-lg"
 							role="menuitem"
 							tabindex="-1"
 							id="user-menu-item-0">View Score</a
-						>
+						> -->
 
 						<button
 							disabled={true}
 							formaction="?/delete"
-							class="w-full px-4 py-2 text-sm bg-red-800 hover:bg-red-700 rounded-b-lg text-left disabled:bg-red-300"
+							class="w-full px-4 py-2 text-sm bg-red-800 hover:bg-red-700 rounded-lg text-left disabled:bg-red-300"
 							>Delete</button
 						>
 					</div>

@@ -8,7 +8,7 @@ export async function POST({ request, params }) {
   if (!record) {
     return json(false);
   }
-  const newStatus = record.status == "archived" ? "upcoming" : "archived"
+  const newStatus = record.status == "archived" ? "live" : "archived"
   record.status = newStatus
   record?.save()
   return json({
