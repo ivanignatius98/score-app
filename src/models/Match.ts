@@ -4,8 +4,8 @@ const MatchSchema = new mongoose.Schema({
   number: Number,
   status: {
     type: String,
-    enum: ['live', 'archived', 'upcoming'],
-    default: 'upcoming'
+    enum: ['live', 'archived'],
+    default: 'live'
   },
   aTeam: {
     players: [{

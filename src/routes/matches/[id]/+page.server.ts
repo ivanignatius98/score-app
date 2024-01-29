@@ -44,12 +44,12 @@ export const actions: Actions = {
 		const formData = await request.formData();
 		const data = formData.get('data');
 		const parsed = JSON.parse(data as string);
-		const series = await Series.findOne({ _id: params.id }).populate("matches");
+		const series = await Series.findOne({ _id: params.id }).populate('matches');
 		if (!series) return { success: false };
-		let matches = [...series.matches]
+		let matches = [...series.matches];
 		let { _id, ...newSave } = parsed;
 		if (_id) {
-			await Match.updateOne({ _id }, newSave)
+			await Match.updateOne({ _id }, newSave);
 			const index = matches.findIndex((item) => item._id && item._id.equals(_id));
 			if (index !== -1) {
 				// Create a new array with the updated item
@@ -57,15 +57,17 @@ export const actions: Actions = {
 			}
 		} else {
 			const newRecord = await Match.create(newSave);
-			(series as any).matches = [newRecord._id, ...series.matches]
-			matches = [(newRecord as any), ...matches]
+			(series as any).matches = [newRecord._id, ...series.matches];
+			matches = [newRecord as any, ...matches];
+			_id = newRecord._id
 		}
 
 		await series.save();
 
 		return {
 			success: true,
-			records: JSON.parse(JSON.stringify(matches))
+			records: JSON.parse(JSON.stringify(matches)),
+			newId: _id
 		};
 	},
 	delete: async ({ request, params }) => {
@@ -73,19 +75,19 @@ export const actions: Actions = {
 		const data = formData.get('data');
 		const parsed = JSON.parse(data as string);
 		await Match.findByIdAndDelete(parsed._id);
-		const series = await Series.findOne({ _id: formData.get('series_id') }).populate("matches")
+		const series = await Series.findOne({ _id: formData.get('series_id') }).populate('matches');
 		if (!series) {
-			return { success: false }
+			return { success: false };
 		}
-		const indexToDelete = series.matches.findIndex(obj => obj._id.toString() === parsed._id);
+		const indexToDelete = series.matches.findIndex((obj) => obj._id.toString() === parsed._id);
 		if (indexToDelete !== -1) {
 			series.matches.splice(indexToDelete, 1);
 		}
-		await series.save()
+		await series.save();
 
 		return {
 			success: true,
 			records: JSON.parse(JSON.stringify([...series.matches]))
 		};
-	},
+	}
 };

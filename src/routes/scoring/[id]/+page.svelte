@@ -38,7 +38,7 @@
 
 		navbarStore.update((current: NavValue) => ({
 			...current,
-			title: 'Scoring',
+			title: 'Scoring Match ' + match?.number,
 			button: {
 				label: data.match.status == 'archived' ? 'Reopen' : 'Submit',
 				action: () => {

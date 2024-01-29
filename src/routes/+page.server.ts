@@ -14,12 +14,25 @@ export const load: Load = async () => {
   let series = await getInitSeries();
   let members = await User.find().lean();
 
+	const sortedMembers = members.sort((a: any, b: any) => {
+		// Convert names to lowercase for case-insensitive sorting
+		const nameA = a.name.toLowerCase();
+		const nameB = b.name.toLowerCase();
+		// Compare names and return the result
+		if (nameA < nameB) {
+			return -1;
+		}
+		if (nameA > nameB) {
+			return 1;
+		}
+		return 0;
+	});
   if (!series) {
     return { series: [], members: [] }
   }
   return {
     series: JSON.parse(JSON.stringify(series)),
-    members: JSON.parse(JSON.stringify(members))
+    members: JSON.parse(JSON.stringify(sortedMembers))
   };
 };
 

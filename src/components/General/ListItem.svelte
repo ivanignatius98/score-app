@@ -12,11 +12,8 @@
 		<div class="flex-1 min-w-0">
 			<p class="text-sm font-medium text-white">
 				{item.name}
-				<span
-					class="bg-green-500 bg-opacity-10 text-green-500 text-opacity-100 ring-1 ring-green-500 ring-opacity-20 ring-inset ml-3 inline-block py-1 px-2 text-xs font-medium rounded-md"
-				>
-					Complete
-				</span>
+
+				<slot name="additional-view" />
 			</p>
 			<p class="text-xs text-gray-500 truncate mt-2">{item.desc}</p>
 		</div>
