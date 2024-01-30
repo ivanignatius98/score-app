@@ -10,6 +10,7 @@
 	import Dropdown from '../../../components/General/Dropdown.svelte';
 	import { matchSummary } from '../../../services/series/index.ts';
 	import { goto } from '$app/navigation';
+	import ScoreTable from '../../scoring/[id]/ScoreTable.svelte';
 
 	export let data;
 	let number = -1;
@@ -22,6 +23,7 @@
 	let playerMap = new Map();
 	let showSidePanel = false;
 	let seriesId: string = '';
+	let summary = [];
 
 	function init() {
 		navbarStore.update((current: NavValue) => ({
@@ -33,7 +35,8 @@
 					showSidePanel = true;
 				}
 			},
-			breadcrumbs: [{ href: '#', label: 'Series' }]
+			breadcrumbs: [{ href: '#', label: 'Series' }],
+			backNav: '/'
 		}));
 
 		// seriesStore.update(() => {
@@ -49,7 +52,7 @@
 	init();
 
 	const handleGetSummary = async (val: string) => {
-		const summary = await matchSummary(val);
+		summary = (await matchSummary(val)).record;
 	};
 	//#region teamhandling
 	const classNames = (...classes: string[]) => {
@@ -200,7 +203,11 @@
 		View all
 	</button>
 </div>
-
+<Modal openModal={summary.length > 0}>
+	<div slot="content">
+		<ScoreTable bind:data={summary} />
+	</div>
+</Modal>
 <SlideOver bind:showSidePanel title={`${selectedId ? 'Update' : 'Create New'}  Match`}>
 	<form
 		method="post"
