@@ -59,7 +59,7 @@ export const actions: Actions = {
 			const newRecord = await Match.create(newSave);
 			(series as any).matches = [newRecord._id, ...series.matches];
 			matches = [newRecord as any, ...matches];
-			_id = newRecord._id
+			_id = newRecord._id.toString()
 		}
 
 		await series.save();
