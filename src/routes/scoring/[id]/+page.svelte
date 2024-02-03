@@ -4,9 +4,10 @@
 
 	import ActionPairs from './ActionPairs.svelte';
 	import { navbarStore } from '../../../stores/navbar';
-	import type { NavValue, Player, Action, Match, StatMap } from '../../../types';
+	import type { NavValue, Player, Action, Match, StatMap, StatSummary } from '../../../types';
 	import { deleteAction, saveAction, updateMatchStatus } from '../../../services/scoring/index.js';
 	import ScoreTable from './ScoreTable.svelte';
+	import { roundToOneDec } from '../../../helpers/general.js';
 
 	export let data;
 
@@ -25,8 +26,8 @@
 	}[] = [];
 	let aPoints = 0;
 	let bPoints = 0;
-	let arrA: (StatMap & { player: Player })[] = [];
-	let arrB: (StatMap & { player: Player })[] = [];
+	let arrA: StatSummary[] = [];
+	let arrB: StatSummary[] = [];
 
 	let currTab = 'playbyplay';
 	function init() {
@@ -39,12 +40,14 @@
 		navbarStore.update((current: NavValue) => ({
 			...current,
 			title: 'Scoring Match ' + match?.number,
-			button: {
-				label: data.match.status == 'archived' ? 'Reopen' : 'Submit',
-				action: () => {
-					handleCloseMatch();
+			buttons: [
+				{
+					label: data.match.status == 'archived' ? 'Reopen' : 'Submit',
+					action: () => {
+						handleCloseMatch();
+					}
 				}
-			},
+			],
 			backNav: '/matches/' + data.series._id
 		}));
 	}
@@ -87,7 +90,25 @@
 			const temp = [];
 			for (let [key] of val) {
 				const stat = playerStats.get(key);
-				if (stat) temp.push(stat);
+				if (stat) {
+					const obj = {
+						FG: `${stat['FG'].made}/${stat['FG'].attempt}`,
+						'FG%': `${
+							stat['FG'].attempt == 0
+								? '0.0'
+								: roundToOneDec((stat['FG'].made / stat['FG'].attempt) * 100)
+						}`,
+						'3PT': `${stat['3PT'].made}/${stat['3PT'].attempt}`,
+						'3PT%': `${
+							stat['3PT'].attempt == 0
+								? '0.0'
+								: roundToOneDec((stat['3PT'].made / stat['3PT'].attempt) * 100)
+						}`,
+						PTS: stat['3PT'].made * 2 + stat['FG'].made,
+						player: stat.player.name
+					};
+					temp.push(obj);
+				}
 			}
 			return temp;
 		};
@@ -135,12 +156,14 @@
 
 			navbarStore.update((current: NavValue) => ({
 				...current,
-				button: {
-					label: res == 'archived' ? 'Reopen' : 'Submit',
-					action: () => {
-						handleCloseMatch();
+				buttons: [
+					{
+						label: res == 'archived' ? 'Reopen' : 'Submit',
+						action: () => {
+							handleCloseMatch();
+						}
 					}
-				}
+				]
 			}));
 		}
 	};

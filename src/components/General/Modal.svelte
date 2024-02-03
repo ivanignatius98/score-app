@@ -10,7 +10,7 @@
 	<div class="z-50 fixed w-full h-full top-0 left-0 flex items-center justify-center">
 		<div class="fixed w-full h-full bg-gray-900 opacity-50"></div>
 		<div
-			class="bg-gray-800 w-full max-w-sm rounded-md shadow-xl z-50"
+			class="bg-gray-800 w-full max-w-sm md:max-w-xl overflow-auto rounded-md shadow-xl z-50"
 			use:clickOutside
 			on:outclick={() => (openModal = false)}
 		>
