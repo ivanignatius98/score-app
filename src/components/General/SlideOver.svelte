@@ -19,11 +19,11 @@
 							on:outclick={() => (showSidePanel = false)}
 							bind:clientWidth={width}
 							transition:fly={{ x: width }}
-							class="m-auto flex h-full flex-col overflow-y-auto bg-gray-900 shadow-xl"
+							class="m-auto flex h-full flex-col bg-gray-900 shadow-xl"
 						>
 							<div class="bg-indigo-700">
 								<div class="px-4 sm:px-6 py-5 mt-1">
-									<div class="flex items-start justify-between ">
+									<div class="flex items-start justify-between">
 										<h2 class="text-lg font-medium text-white">{title}</h2>
 										<div class="ml-3 flex h-7 items-center">
 											<button
@@ -56,9 +56,7 @@
 							</div>
 							<div class="relative mt-6 flex-1 px-4 sm:px-6">
 								<div class="absolute inset-0 px-4 sm:px-6">
-									<div class="h-full">
-										<slot name="content" />
-									</div>
+									<slot name="content" />
 								</div>
 							</div>
 						</div>
