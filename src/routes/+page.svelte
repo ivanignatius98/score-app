@@ -30,12 +30,12 @@
 		navbarStore.update((current: NavValue) => ({
 			...current,
 			title: 'Series',
-			button: {
+			buttons: [{
 				label: 'Create',
 				action: () => {
 					showSidePanel = true;
 				}
-			},
+			}],
 			breadcrumbs: [{ href: '#', label: 'test' }]
 		}));
 

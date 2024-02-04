@@ -4,7 +4,7 @@
 	import type { NavValue } from '../types';
 	let navValue: NavValue = {
 		title: '',
-		button: { label: 'Create', action: () => {} },
+		buttons: [{ label: 'Create', action: () => {}, primary: true }],
 		breadcrumbs: [],
 		backNav: '#'
 	};
@@ -15,6 +15,10 @@
 
 	const goBack = () => {
 		goto(navValue.backNav);
+	};
+
+	const classNames = (...classes: string[]) => {
+		return classes.filter(Boolean).join(' ');
 	};
 </script>
 
@@ -85,14 +89,19 @@
 				{navValue.title}
 			</h2>
 		</div>
-		<div class="mt-4 flex-shrink-0 flex md:mt-0 md:ml-4">
-			<button
-				on:click={() => navValue.button.action()}
-				type="button"
-				class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500"
-			>
-				{navValue.button.label}
-			</button>
+		<div class="mt-4 flex-shrink-0 flex md:mt-0 md:ml-4 gap-3">
+			{#each navValue.buttons as row, i}
+				<button
+					on:click={() => row.action()}
+					type="button"
+					class={classNames(
+						row.primary ? 'bg-indigo-800 hover:bg-indigo-700' : 'bg-gray-800 hover:bg-gray-700',
+						'inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white  focus:outline-none focus:ring-2 focus:ring-offset-2'
+					)}
+				>
+					{row.label}
+				</button>
+			{/each}
 		</div>
 	</div>
 </div>

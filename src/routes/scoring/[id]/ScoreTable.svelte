@@ -1,10 +1,7 @@
 <script lang="ts">
-	import type { Player, StatMap } from '../../../types';
+	import type { StatSummary } from '../../../types';
 
-	export let data: (StatMap & { player: Player })[] = [];
-	const roundToOneDec = (val: number) => {
-		return (Math.round(val * 10) / 10).toString() + (Number.isInteger(val) ? '.0' : '');
-	};
+	export let data: StatSummary[] = [];
 </script>
 
 <table class="border-collapse separate">
@@ -16,25 +13,23 @@
 			<td class="px-2 min-w-[42px] text-center">3PT</td>
 			<td class="px-2 min-w-[42px] text-center">3PT%</td>
 			<td class="px-2 min-w-[42px] text-center">POINTS</td>
+			{#if data[0]['PPG']}
+				<td class="px-2 min-w-[42px] text-center">PPG</td>
+			{/if}
 		</tr>
 	</thead>
 	<tbody>
 		{#each data as row}
 			<tr class="text-sm text-center">
-				<td class="px-2 py-1 text-left">{row.player.name}</td>
-				<td class="">{row['FG'].made}-{row['FG'].attempt}</td>
-				<td class=""
-					>{row['FG'].attempt == 0
-						? '0.0'
-						: roundToOneDec((row['FG'].made / row['FG'].attempt) * 100)}</td
-				>
-				<td class="">{row['3PT'].made}-{row['3PT'].attempt}</td>
-				<td
-					>{row['3PT'].attempt == 0
-						? '0.0'
-						: roundToOneDec((row['3PT'].made / row['3PT'].attempt) * 100)}</td
-				>
-				<td class="">{row['3PT'].made * 2 + row['FG'].made}</td>
+				<td class="px-2 py-1 text-left">{row.player}</td>
+				<td class="">{row['FG']}</td>
+				<td class="">{row['FG%']}</td>
+				<td class="">{row['3PT']}</td>
+				<td class="">{row['3PT%']}</td>
+				<td class="">{row['PTS']}</td>
+				{#if row['PPG']}
+					<td class="">{row['PPG']}</td>
+				{/if}
 			</tr>
 		{/each}
 	</tbody>

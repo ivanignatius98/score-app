@@ -5,11 +5,12 @@
 	import ListItem from '../../../components/General/ListItem.svelte';
 	import { getInitials } from '../../../helpers/general.js';
 	import { navbarStore } from '../../../stores/navbar.ts';
-	import type { Match, NavValue, Player } from '../../../types';
+	import type { Match, NavValue, Player, StatSummary } from '../../../types';
 	import { Types } from 'mongoose';
 	import Dropdown from '../../../components/General/Dropdown.svelte';
 	import { matchSummary } from '../../../services/series/index.ts';
 	import { goto } from '$app/navigation';
+	import ScoreTable from '../../scoring/[id]/ScoreTable.svelte';
 
 	export let data;
 	let number = -1;
@@ -22,26 +23,37 @@
 	let playerMap = new Map();
 	let showSidePanel = false;
 	let seriesId: string = '';
+	let summary: StatSummary[] = [];
 
 	function init() {
 		navbarStore.update((current: NavValue) => ({
 			...current,
 			title: 'Matches',
-			button: {
-				label: 'Create',
-				action: () => {
-					showSidePanel = true;
+			buttons: [
+				{
+					label: 'Edit',
+					action: () => {
+						showSidePanel = true;
+					}
+				},
+				{
+					label: 'Summary',
+					action: () => {
+						handleGetSummary(seriesId);
+					}
+				},
+				{
+					label: 'Create',
+					primary: true,
+					action: () => {
+						showSidePanel = true;
+					}
 				}
-			},
+			],
 			breadcrumbs: [{ href: '#', label: 'Series' }],
 			backNav: '/'
 		}));
 
-		// seriesStore.update(() => {
-		// 	return {
-		// 		matches: ['Matches']
-		// 	};
-		// });
 		matches = data.matches || [];
 		players = data.players || [];
 		playerMap = data.playersMap || new Map();
@@ -50,7 +62,7 @@
 	init();
 
 	const handleGetSummary = async (val: string) => {
-		const summary = await matchSummary(val);
+		summary = (await matchSummary(val)).record;
 	};
 	//#region teamhandling
 	const classNames = (...classes: string[]) => {
@@ -190,18 +202,21 @@
 		{/each}
 	</ul>
 </div>
-<div class="mt-6">
+<!-- <div class="mt-6">
 	<button
 		type="button"
 		on:click={() => {
-			handleGetSummary(seriesId);
 		}}
 		class="w-full flex justify-center items-center px-4 py-2 shadow-sm text-sm font-medium rounded-md text-white bg-white bg-opacity-10 hover:bg-opacity-20"
 	>
 		View all
 	</button>
-</div>
-
+</div> -->
+<Modal openModal={summary.length > 0} title="Series Summary">
+	<div slot="content">
+		<ScoreTable bind:data={summary} />
+	</div>
+</Modal>
 <SlideOver bind:showSidePanel title={`${selectedId ? 'Update' : 'Create New'}  Match`}>
 	<form
 		method="post"
