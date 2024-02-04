@@ -206,55 +206,71 @@
 			};
 		}}
 		slot="content"
-		class="flex flex-1 flex-col justify-between h-full"
+		class="flex flex-1 flex-col justify-between h-full px-4 sm:px-6"
 	>
-		<div class="divide-y divide-gray-200 px-4 sm:px-6">
-			<div class="space-y-6">
-				<div>
-					<label for="name" class="block mb-2 text-sm text-white">Series name</label>
-					<input
-						type="text"
-						name="name"
-						bind:value={name}
-						class="border text-sm rounded-md block w-full py-2 px-3 bg-gray-800 border-gray-600 placeholder-gray-500 focus:border-indigo-500 text-gray-300"
-						placeholder="Series 1"
-						required
-					/>
-				</div>
-				<div>
-					<label for="series-date" class="block mb-2 text-sm text-white">Date</label>
-					<input
-						type="date"
-						name="series-date"
-						bind:value={seriesDate}
-						class="border text-sm rounded-md block w-full py-2 px-3 bg-gray-800 border-gray-600 placeholder-gray-500 focus:border-indigo-500 text-gray-300"
-						required
-					/>
-				</div>
-				<div>
-					<h3 class="text-sm font-medium text-white">Players for the day</h3>
-					<div class="mt-2">
-						<div class="flex gap-1 flex-wrap">
-							{#each players as person}
-								<button class="group" on:click={() => handleAddPlayer(person, true)} type="button">
+		<section class="space-y-6">
+			<div>
+				<label for="name" class="block mb-2 text-sm text-white">Series name</label>
+				<input
+					type="text"
+					name="name"
+					bind:value={name}
+					class="border text-sm rounded-md block w-full py-2 px-3 bg-gray-800 border-gray-600 placeholder-gray-500 focus:border-indigo-500 text-gray-300"
+					placeholder="Series 1"
+					required
+				/>
+			</div>
+			<div>
+				<label for="series-date" class="block mb-2 text-sm text-white">Date</label>
+				<input
+					type="date"
+					name="series-date"
+					bind:value={seriesDate}
+					class="border text-sm rounded-md block w-full py-2 px-3 bg-gray-800 border-gray-600 placeholder-gray-500 focus:border-indigo-500 text-gray-300"
+					required
+				/>
+			</div>
+			<h3 class="text-sm font-medium text-white">Players for the day</h3>
+		</section>
+		<div class="divide-y divide-gray-200 overflow-auto">
+			<div class="space-y-6 mt-2">
+				<ul role="list">
+					{#each players as person}
+						<li
+							class="box-border border-t-[1px] border-solid first:border-0 border-gray-700 py-3 px-2"
+						>
+							<div class="flex items-center">
+								<div class="flex-grow">
+									<!-- Content for the first div (takes up max space) -->
 									<span
-										class={classNames(
-											person.colorClass,
-											'inline-flex items-center justify-center h-8 w-8 rounded-full'
-										)}
+										class="bg-blue-500 group-hover:bg-blue-700 inline-flex items-center justify-center h-8 w-8 rounded-full mr-2"
 									>
 										<span
 											class="text-sm font-medium leading-none text-white group-hover:text-gray-300"
 											>{person?.initials}</span
 										>
 									</span>
+									{person?.name}
+								</div>
+								<button
+									class="text-sm font-medium hover:opacity-90 text-indigo-400"
+									on:click|preventDefault={() => {
+										handleAddPlayer(person, true);
+									}}
+								>
+									Remove
 								</button>
-							{/each}
-
-							<button
-								on:click={() => (openModal = true)}
-								type="button"
-								class="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 border-dashed border-gray-700 bg-gray-800 text-gray-600 hover:border-gray-600 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+							</div>
+						</li>
+					{/each}
+					<li class="box-border border-t-[1px] border-solid border-gray-700 py-3 px-2">
+						<button
+							class="group flex items-center gap-3"
+							on:click={() => (openModal = true)}
+							type="button"
+						>
+							<div
+								class="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 border-dashed border-gray-700 bg-gray-800 text-gray-600 group-hover:border-gray-600 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
 							>
 								<span class="sr-only">Add team member</span>
 								<svg
@@ -267,67 +283,87 @@
 										d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z"
 									></path></svg
 								>
-							</button>
-							<Modal title="Select Players" bind:openModal>
-								<div slot="header">
-									<div class="mt-2">
-										<input
-											type="search"
-											class="border text-sm rounded-md block w-full py-2 px-3 bg-gray-900 border-gray-900 placeholder-gray-500 focus:border-indigo-500 text-gray-300"
-											bind:value={playerq}
-											placeholder="Search User"
-											required
-										/>
-									</div>
-								</div>
-								<div slot="content">
-									<div class="overflow-y-auto overflow-x-hidden max-h-64 py-8">
-										<ul role="list" class="-my-4 text-sm">
-											{#each filteredMembers as person}
-												<li class="py-3 px-8 rounded-md">
-													<div class="flex justify-between items-center">
-														{person.name}
-														<div class="flex gap-2">
-															<button
-																on:click={() => {
-																	handleAddPlayer(person);
-																}}
-																type="button"
-																class={classNames(
-																	playerIdsTmp.has(person._id) ? 'bg-green-700' : '',
-																	'ring-1 ring-green-700 p-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant min-w-[100px]'
-																)}
-															>
-																Select{playerIdsTmp.has(person._id) ? 'ed' : ''}
-															</button>
-														</div>
-													</div>
-												</li>
-											{/each}
-										</ul>
-									</div>
-									<div class="p-6 border-t-[1px] border-slate-700">
-										<button
-											on:click={() => {
-												playerIds = playerIdsTmp;
-												players = playersTmp;
-												openModal = false;
-											}}
-											class="p-2 bg-blue-500 w-full rounded-md text-sm disabled:bg-blue-300"
-											type="button"
-											disabled={playersTmp.length < 2}
-										>
-											Add Players
-										</button>
-									</div>
-								</div>
-							</Modal>
-						</div>
-					</div>
-				</div>
+							</div>
+							<span class="text-sm font-medium group-hover:opacity-90 text-indigo-400">Add</span>
+						</button>
+					</li>
+				</ul>
 			</div>
 		</div>
 
+		<Modal title="Select Players" bind:openModal>
+			<div slot="header">
+				<div class="mt-2">
+					<input
+						type="search"
+						class="border text-sm rounded-md block w-full py-2 px-3 bg-gray-900 border-gray-900 placeholder-gray-500 focus:border-indigo-500 text-gray-300"
+						bind:value={playerq}
+						placeholder="Search User"
+						required
+					/>
+				</div>
+			</div>
+			<div slot="content">
+				<div class="overflow-y-auto overflow-x-hidden h-64 md:h-72 py-8">
+					<ul role="list" class="-my-4 text-sm">
+						{#each filteredMembers as person}
+							<li class="py-3 px-8 rounded-md">
+								<div class="flex justify-between items-center">
+									{person.name}
+									<div class="flex gap-2">
+										<button
+											on:click={() => {
+												handleAddPlayer(person);
+											}}
+											type="button"
+											class={classNames(
+												playerIdsTmp.has(person._id) ? 'bg-green-700' : '',
+												'ring-1 ring-green-700 p-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant min-w-[100px]'
+											)}
+										>
+											Select{playerIdsTmp.has(person._id) ? 'ed' : ''}
+										</button>
+									</div>
+								</div>
+							</li>
+						{/each}
+						<!-- {#if filteredMembers.length == 0 && playerq != ''}
+							<li class="py-3 px-8 rounded-md">
+								<div class="flex justify-between items-center">
+									Add {playerq} as new User?
+									<div class="flex gap-2">
+										<button
+											on:click={() => {
+											}}
+											type="button"
+											class={classNames(
+												'ring-1 ring-green-700 p-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant min-w-[100px]'
+											)}
+										>
+											Select
+										</button>
+									</div>
+								</div>
+							</li>
+						{/if} -->
+					</ul>
+				</div>
+				<div class="p-6 border-t-[1px] border-slate-700">
+					<button
+						on:click={() => {
+							playerIds = playerIdsTmp;
+							players = playersTmp;
+							openModal = false;
+						}}
+						class="p-2 bg-blue-500 w-full rounded-md text-sm disabled:bg-blue-300"
+						type="button"
+						disabled={playersTmp.length < 2}
+					>
+						Add Players
+					</button>
+				</div>
+			</div>
+		</Modal>
 		<div class="flex flex-shrink-0 p-4 gap-3 items-center">
 			<button
 				disabled={isLoading}

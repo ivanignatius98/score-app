@@ -33,7 +33,8 @@
 					showSidePanel = true;
 				}
 			},
-			breadcrumbs: [{ href: '#', label: 'Series' }]
+			breadcrumbs: [{ href: '#', label: 'Series' }],
+			backNav: '/'
 		}));
 
 		// seriesStore.update(() => {
