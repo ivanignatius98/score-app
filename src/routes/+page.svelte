@@ -8,6 +8,7 @@
 	import { getInitials } from '../helpers/general.js';
 	import { enhance } from '$app/forms';
 	import Dropdown from '../components/General/Dropdown.svelte';
+	import { saveAction } from '../services/user/index.ts';
 	let name = '';
 	let seriesDate = '';
 	let isLoading = false;
@@ -127,6 +128,27 @@
 		playersTmp = [...players];
 		playerIdsTmp = new Set([...playerIds]);
 		showSidePanel = true;
+	};
+
+	const handleAddNewUser = async () => {
+		const { success, record } = await saveAction({
+			name: playerq
+		});
+		if (success) {
+			playerIds = new Set([record._id, ...playerIdsTmp]);
+			players = [
+				{
+					_id: record._id,
+					name: record.name,
+					initials: getInitials(record.name),
+					colorClass: 'bg-red-500'
+				},
+				...players
+			];
+			playerIdsTmp = new Set([...playerIds]);
+			playersTmp = [...players];
+			members = [record, ...members];
+		}
 	};
 </script>
 
@@ -327,14 +349,13 @@
 								</div>
 							</li>
 						{/each}
-						<!-- {#if filteredMembers.length == 0 && playerq != ''}
+						{#if filteredMembers.length == 0 && playerq != ''}
 							<li class="py-3 px-8 rounded-md">
 								<div class="flex justify-between items-center">
 									Add {playerq} as new User?
 									<div class="flex gap-2">
 										<button
-											on:click={() => {
-											}}
+											on:click={() => handleAddNewUser()}
 											type="button"
 											class={classNames(
 												'ring-1 ring-green-700 p-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant min-w-[100px]'
@@ -345,7 +366,7 @@
 									</div>
 								</div>
 							</li>
-						{/if} -->
+						{/if}
 					</ul>
 				</div>
 				<div class="p-6 border-t-[1px] border-slate-700">
