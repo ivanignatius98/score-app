@@ -2,9 +2,10 @@ import { json } from '@sveltejs/kit';
 import { Stat } from '../../../../../models/Stat.js';
 import { Series } from '../../../../../models/Series.js';
 import type { Player, StatMap, Match as MatchType } from '../../../../../types/index.js';
+import type { Schema } from 'mongoose';
 
 /** @type {import('./$types').RequestHandler} */
-export async function GET({ request, params }) {
+export async function GET({ params }) {
 	const series = await Series.findOne({ _id: params.id })
 		.populate('players')
 		.populate('matches')
@@ -15,15 +16,26 @@ export async function GET({ request, params }) {
 	const { matches, players } = JSON.parse(JSON.stringify(series));
 	const dataMap = new Map(players.map((item: Player) => [item._id, item.name]));
 	const matchIds: string[] = [];
-	matches.forEach((element: MatchType & { _id: any }) => {
+	const matchCountMap = new Map();
+	matches.forEach((element: MatchType & { _id: Schema.Types.ObjectId }) => {
+		const eachMatchPlayers = [...element.aTeam.players, ...element.bTeam.players];
+
+		for (const row of eachMatchPlayers) {
+			const existing = matchCountMap.get(row);
+			if (existing) {
+				matchCountMap.set(row, existing + 1);
+			} else {
+				matchCountMap.set(row, 1);
+			}
+		}
 		matchIds.push(element._id.toString());
 	});
 	const summ = await Stat.find({ match_id: { $in: matchIds } }).lean();
 
-	let playerStats = new Map();
+	const playerStats = new Map();
 
 	// count stats
-	for (let row of summ) {
+	for (const row of summ) {
 		const defaultStat: StatMap = {
 			FG: {
 				made: 0,
@@ -56,7 +68,7 @@ export async function GET({ request, params }) {
 	const roundToOneDec = (val: number) => {
 		return (Math.round(val * 10) / 10).toString() + (Number.isInteger(val) ? '.0' : '');
 	};
-	for (let [key, value] of playerStats) {
+	for (const [key, value] of playerStats) {
 		const fg = `${value['FG'].made}/${value['FG'].attempt}`;
 		const three = `${value['3PT'].made}/${value['3PT'].attempt}`;
 		const fgperc =
@@ -69,13 +81,16 @@ export async function GET({ request, params }) {
 				: roundToOneDec((value['3PT'].made / value['3PT'].attempt) * 100);
 
 		const pts = value['FG'].made + value['3PT'].made * 2;
+		const games = matchCountMap.get(key)
+
 		arr.push({
 			player: value.player,
 			FG: fg,
 			'FG%': fgperc,
 			'3PT': three,
 			'3PT%': threeperc,
-			PPG: roundToOneDec(pts / matchIds.length),
+			games,
+			PPG: roundToOneDec(pts / games),
 			PTS: pts
 		});
 	}
