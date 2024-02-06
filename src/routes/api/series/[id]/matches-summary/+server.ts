@@ -69,33 +69,42 @@ export async function GET({ params }) {
 		return (Math.round(val * 10) / 10).toString() + (Number.isInteger(val) ? '.0' : '');
 	};
 	for (const [key, value] of playerStats) {
-		const fg = `${value['FG'].made}/${value['FG'].attempt}`;
+		const fg = `${value['FG'].made + value['3PT'].made}/${
+			value['FG'].attempt + value['3PT'].attempt
+		}`;
+		const two = `${value['FG'].made}/${value['FG'].attempt}`;
 		const three = `${value['3PT'].made}/${value['3PT'].attempt}`;
-		const fgperc =
-			value['FG'].attempt == 0
-				? '0.0'
-				: roundToOneDec((value['FG'].made / value['FG'].attempt) * 100);
-		const threeperc =
-			value['3PT'].attempt == 0
-				? '0.0'
-				: roundToOneDec((value['3PT'].made / value['3PT'].attempt) * 100);
+		// const fgperc =
+		// 	value['FG'].attempt == 0
+		// 		? '0.0'
+		// 		: roundToOneDec((value['FG'].made / value['FG'].attempt) * 100);
+		// const threeperc =
+		// 	value['3PT'].attempt == 0
+		// 		? '0.0'
+		// 		: roundToOneDec((value['3PT'].made / value['3PT'].attempt) * 100);
 
 		const pts = value['FG'].made + value['3PT'].made * 2;
-		const games = matchCountMap.get(key)
+		const games = matchCountMap.get(key);
 
 		arr.push({
 			player: value.player,
 			FG: fg,
-			'FG%': fgperc,
+			'FG%': `${roundToOneDec(
+				((value['FG'].made + value['3PT'].made) / (value['FG'].attempt + value['3PT'].attempt)) *
+					100
+			)}`,
+			'2PT': two,
+			// 'FG%': fgperc,
 			'3PT': three,
-			'3PT%': threeperc,
+			// '3PT%': threeperc,
 			games,
 			PPG: roundToOneDec(pts / games),
 			PTS: pts
 		});
 	}
+
 	return json({
 		success: true,
-		record: arr
+		record: arr.sort((a: any, b: any) => b.PTS - a.PTS)
 	});
 }

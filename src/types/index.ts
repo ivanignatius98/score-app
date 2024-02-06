@@ -56,9 +56,11 @@ export interface StatMap {
 export interface StatSummary {
 	player: string;
 	FG: string;
+	'2PT': string;
 	'FG%': string;
 	'3PT': string;
-	'3PT%': string;
+	// '3PT%': string;
+	games: string | number;
 	PTS: string | number;
 	PPG?: string;
 }
