@@ -216,7 +216,7 @@
 </div> -->
 <Modal bind:openModal={showSummaryModal} title="Series Summary">
 	<div slot="content">
-		<div class="min-h-[240px]">
+		<div class="min-h-[240px] overflow-x-auto">
 			{#await summary}
 				<div role="status" class="absolute -translate-x-1/2 -translate-y-1/2 top-2/4 left-1/2">
 					<svg
