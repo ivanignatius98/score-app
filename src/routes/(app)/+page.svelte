@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { Types } from 'mongoose';
-	import Modal from '../components/General/Modal.svelte';
-	import SlideOver from '../components/General/SlideOver.svelte';
-	import ListItem from '../components/General/ListItem.svelte';
-	import { navbarStore } from '../stores/navbar.ts';
-	import type { NavValue, Player, Series } from '../types';
-	import { getInitials } from '../helpers/general.js';
+	import Modal from '../../components/General/Modal.svelte';
+	import SlideOver from '../../components/General/SlideOver.svelte';
+	import ListItem from '../../components/General/ListItem.svelte';
+	import { navbarStore } from '../../stores/navbar.ts';
+	import type { NavValue, Player, Series } from '../../types/index.ts';
+	import { getInitials } from '../../helpers/general.js';
 	import { enhance } from '$app/forms';
-	import Dropdown from '../components/General/Dropdown.svelte';
-	import { saveAction } from '../services/user/index.ts';
+	import Dropdown from '../../components/General/Dropdown.svelte';
+	import { saveAction } from '../../services/user/index.ts';
 	import { goto } from '$app/navigation';
 	let name = '';
 	let seriesDate = '';
@@ -210,7 +210,7 @@
 			}
 			formData.append('data', JSON.stringify(newSeries));
 			isLoading = true;
-			let redir = ""
+			let redir = '';
 			return async ({ update, result }) => {
 				if (result.status == 200 && result.type == 'success') {
 					if (result.data && result.data.records) {
@@ -219,7 +219,7 @@
 						series = temp;
 
 						if (selectedId == '') {
-							redir = '/matches/' + result.data.records._id
+							redir = '/matches/' + result.data.records._id;
 						}
 					}
 				}

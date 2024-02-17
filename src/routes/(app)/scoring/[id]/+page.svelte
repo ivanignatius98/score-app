@@ -1,13 +1,13 @@
 <script lang="ts">
-	import Counter from '../../../components/General/Counter.svelte';
-	import Modal from '../../../components/General/Modal.svelte';
+	import Counter from '../../../../components/General/Counter.svelte';
+	import Modal from '../../../../components/General/Modal.svelte';
 
 	import ActionPairs from './ActionPairs.svelte';
-	import { navbarStore } from '../../../stores/navbar';
-	import type { NavValue, Player, Action, Match, StatMap, StatSummary } from '../../../types';
-	import { deleteAction, saveAction, updateMatchStatus } from '../../../services/scoring/index.js';
-	import ScoreTable from './ScoreTable.svelte';
-	import { roundToOneDec } from '../../../helpers/general.js';
+	import { navbarStore } from '../../../../stores/navbar';
+	import type { NavValue, Player, Action, Match, StatMap, StatSummary } from '../../../../types';
+	import { deleteAction, saveAction, updateMatchStatus } from '../../../../services/scoring/index.js';
+	import ScoreTable from '../../../../components/Scoring/ScoreTable.svelte';
+	import { roundToOneDec } from '../../../../helpers/general.js';
 
 	export let data;
 

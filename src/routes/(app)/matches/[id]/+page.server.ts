@@ -1,8 +1,8 @@
 import { Types } from 'mongoose';
-import { Match } from '../../../models/Match';
-import { User } from '../../../models/User';
-import { Series } from '../../../models/Series';
-import type { Player } from '../../../types';
+import { Match } from '../../../../models/Match';
+import { User } from '../../../../models/User';
+import { Series } from '../../../../models/Series';
+import type { Player } from '../../../../types';
 
 import type { Actions, Load } from '@sveltejs/kit';
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import ActionButton from './ActionButton.svelte';
-	import type { Action } from '../../../types';
+	import type { Action } from '../../../../types';
 	const dispatch = createEventDispatcher();
 
 	export let action = { value: 2, type: 'FG' };

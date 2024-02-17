@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { StatSummary } from '../../../types';
+	import type { StatSummary } from '../../types';
 
 	export let data: StatSummary[] = [];
 </script>

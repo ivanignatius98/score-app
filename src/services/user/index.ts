@@ -1,3 +1,20 @@
+export const login = async (payload: any) => {
+	try {
+		const response = await fetch('/api/login', {
+			method: 'POST',
+			body: JSON.stringify(payload),
+			headers: {
+				'content-type': 'application/json'
+			}
+		});
+
+		return response.json();
+	} catch (error) {
+		console.error('Error submitting form', error);
+		return { success: false };
+	}
+};
+
 export const saveAction = async (payload: any) => {
 	try {
 		const response = await fetch('/api/users', {
