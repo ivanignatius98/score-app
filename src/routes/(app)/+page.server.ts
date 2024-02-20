@@ -1,8 +1,8 @@
 import { Types } from 'mongoose';
-import { Series } from '../models/Series';
-import { User } from '../models/User';
+import { Series } from '../../models/Series';
+import { User } from '../../models/User';
 import type { Actions, Load } from '@sveltejs/kit';
-import type { Player } from '../types';
+import type { Player } from '../../types';
 
 const getInitSeries = () => {
 	return Series.find().populate('players').sort({ createdAt: -1 }).lean();
@@ -49,6 +49,7 @@ export const actions: Actions = {
 				Object.assign(series, newSave);
 			} else {
 				console.error('Series not found with _id:', _id);
+				return { success: false };
 			}
 		} else {
 			series = new Series(newSave);

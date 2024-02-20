@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import Modal from '../../../components/General/Modal.svelte';
-	import SlideOver from '../../../components/General/SlideOver.svelte';
-	import ListItem from '../../../components/General/ListItem.svelte';
-	import { getInitials } from '../../../helpers/general.js';
-	import { navbarStore } from '../../../stores/navbar.ts';
-	import type { Match, NavValue, Player, StatSummary } from '../../../types';
+	import Modal from '../../../../components/General/Modal.svelte';
+	import SlideOver from '../../../../components/General/SlideOver.svelte';
+	import ListItem from '../../../../components/General/ListItem.svelte';
+	import { getInitials } from '../../../../helpers/general.js';
+	import { navbarStore } from '../../../../stores/navbar.ts';
+	import type { Match, NavValue, Player, StatSummary } from '../../../../types';
 	import { Types } from 'mongoose';
-	import Dropdown from '../../../components/General/Dropdown.svelte';
-	import { matchSummary } from '../../../services/series/index.ts';
+	import Dropdown from '../../../../components/General/Dropdown.svelte';
+	import { matchSummary } from '../../../../services/series/index.ts';
 	import { goto } from '$app/navigation';
-	import ScoreTable from '../../scoring/[id]/ScoreTable.svelte';
+	import ScoreTable from '../../../../components/Scoring/ScoreTable.svelte';
 
 	export let data;
 	let number = -1;
@@ -52,7 +52,7 @@
 				}
 			],
 			breadcrumbs: [{ href: '#', label: 'Series' }],
-			backNav: '/'
+			backButton: { action: () => goto('/'), label: 'Back' }
 		}));
 
 		matches = data.matches || [];

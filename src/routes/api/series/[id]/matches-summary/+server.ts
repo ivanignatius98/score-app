@@ -105,6 +105,6 @@ export async function GET({ params }) {
 
 	return json({
 		success: true,
-		record: arr.sort((a: any, b: any) => b.PTS - a.PTS)
+		record: arr.sort((a: any, b: any) => b.PPG - a.PPG)
 	});
 }

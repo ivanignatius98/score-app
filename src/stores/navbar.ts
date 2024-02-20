@@ -11,7 +11,10 @@ const initialState: NavValue = {
 		}
 	],
 	breadcrumbs: [],
-	backNav: '#'
+	backButton: {
+		label: 'Create',
+		action: () => {}
+	}
 };
 
 export const navbarStore = writable(initialState);

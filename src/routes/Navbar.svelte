@@ -6,16 +6,12 @@
 		title: '',
 		buttons: [{ label: 'Create', action: () => {}, primary: true }],
 		breadcrumbs: [],
-		backNav: '#'
+		backButton: { label: 'Back', action: () => {} }
 	};
 
 	navbarStore.subscribe((value) => {
 		navValue = value;
 	});
-
-	const goBack = () => {
-		goto(navValue.backNav);
-	};
 
 	const classNames = (...classes: string[]) => {
 		return classes.filter(Boolean).join(' ');
@@ -26,7 +22,7 @@
 	<div>
 		<nav class="" aria-label="Back">
 			<button
-				on:click={goBack}
+				on:click={() => navValue.backButton.action()}
 				class="flex items-center text-sm font-medium text-gray-400 hover:text-gray-200"
 			>
 				<svg
@@ -41,7 +37,7 @@
 						clip-rule="evenodd"
 					></path></svg
 				>
-				Back
+				{navValue.backButton.label}
 			</button>
 		</nav>
 		<!-- <nav class="hidden sm:flex" aria-label="Breadcrumb">

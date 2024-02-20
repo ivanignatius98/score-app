@@ -1,9 +1,9 @@
 import { Types } from "mongoose";
-import { Series } from "../../../models/Series";
-import { Match } from "../../../models/Match";
-import { User } from "../../../models/User";
-import { Stat } from "../../../models/Stat";
-import type { Player, Match as MatchType, Action } from '../../../types';
+import { Series } from "../../../../models/Series";
+import { Match } from "../../../../models/Match";
+import { User } from "../../../../models/User";
+import { Stat } from "../../../../models/Stat";
+import type { Player, Match as MatchType, Action } from '../../../../types';
 
 import type { Load } from '@sveltejs/kit';
 
