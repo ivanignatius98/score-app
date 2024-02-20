@@ -34,19 +34,19 @@
 				<p class="mt-2 text-center text-sm text-gray-600">
 					Or
 					<!-- space -->
-					<a href="#" class="font-medium text-indigo-500 hover:text-indigo-400"> register here </a>
+					<a href="/register" class="font-medium text-indigo-500 hover:text-indigo-400"> register here </a>
 				</p>
 			</div>
 			<div class="mt-8 space-y-6">
 				<input type="hidden" name="remember" value="true" />
 				<div class="rounded-md shadow-sm -space-y-px">
 					<div>
-						<label for="email-address" class="sr-only">Email address</label>
+						<label for="username" class="sr-only">Username</label>
 						<input
 							type="text"
 							name="name"
 							class="border sm:text-sm rounded-t-md block w-full py-2 px-3 bg-gray-800 border-gray-600 placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 text-gray-300"
-							placeholder="Email"
+							placeholder="Username"
 							required
 						/>
 					</div>
@@ -63,8 +63,8 @@
 					</div>
 				</div>
 
-				<div class="flex items-center justify-between">
-					<div class="flex items-center">
+				<div class="flex items-center justify-end">
+					<!-- <div class="flex items-center">
 						<input
 							id="remember-me"
 							name="remember-me"
@@ -72,10 +72,10 @@
 							class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
 						/>
 						<label for="remember-me" class="ml-2 block text-sm"> Remember me </label>
-					</div>
+					</div> -->
 
 					<div class="text-sm">
-						<a href="#" class="font-medium text-indigo-500 hover:text-indigo-400">
+						<a href="/login" class="font-medium text-indigo-500 hover:text-indigo-400">
 							Forgot your password?
 						</a>
 					</div>

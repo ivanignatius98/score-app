@@ -39,7 +39,13 @@
 					}
 				}
 			],
-			breadcrumbs: [{ href: '#', label: 'test' }]
+			breadcrumbs: [{ href: '#', label: 'test' }],
+			backButton: {
+				action: () => {
+					goto('/logout');
+				},
+				label: 'Logout'
+			}
 		}));
 
 		series = data.series || [];

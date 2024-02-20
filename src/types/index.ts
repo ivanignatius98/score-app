@@ -37,7 +37,10 @@ export interface NavValue {
 		primary?: boolean;
 	}[];
 	breadcrumbs: { href: string; label: string }[];
-	backNav: string;
+	backButton: {
+		label: string;
+		action: () => void;
+	};
 }
 
 export interface Action {

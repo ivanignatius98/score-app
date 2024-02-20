@@ -52,7 +52,7 @@
 				}
 			],
 			breadcrumbs: [{ href: '#', label: 'Series' }],
-			backNav: '/'
+			backButton: { action: () => goto('/'), label: 'Back' }
 		}));
 
 		matches = data.matches || [];

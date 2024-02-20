@@ -5,9 +5,14 @@
 	import ActionPairs from './ActionPairs.svelte';
 	import { navbarStore } from '../../../../stores/navbar';
 	import type { NavValue, Player, Action, Match, StatMap, StatSummary } from '../../../../types';
-	import { deleteAction, saveAction, updateMatchStatus } from '../../../../services/scoring/index.js';
+	import {
+		deleteAction,
+		saveAction,
+		updateMatchStatus
+	} from '../../../../services/scoring/index.js';
 	import ScoreTable from '../../../../components/Scoring/ScoreTable.svelte';
 	import { roundToOneDec } from '../../../../helpers/general.js';
+	import { goto } from '$app/navigation';
 
 	export let data;
 
@@ -48,7 +53,10 @@
 					}
 				}
 			],
-			backNav: '/matches/' + data.series._id
+			backButton: {
+				action: () => goto('/matches/' + data.series._id),
+				label: 'Back'
+			}
 		}));
 	}
 

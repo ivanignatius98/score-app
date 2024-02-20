@@ -1,4 +1,4 @@
-import type { Actions } from '@sveltejs/kit';
+import { redirect, type Actions } from '@sveltejs/kit';
 import { User } from '../../../models/User';
 import { SECRET_KEY } from '$env/static/private';
 
@@ -15,7 +15,6 @@ export const actions: Actions = {
 		const user = await User.findOne({ name }, '_id name password').exec();
 		if (user == null) {
 			return;
-			// return res.locals.helpers.jsonFormat(400, 'Invalid username / email');
 		}
 		const valid = await user.comparePassword(password);
 
@@ -34,6 +33,6 @@ export const actions: Actions = {
 			httpOnly: true,
 			path: '/'
 		});
-		return { success: valid };
+		throw redirect(302, '/');
 	}
 };

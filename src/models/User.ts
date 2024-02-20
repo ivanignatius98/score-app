@@ -7,7 +7,8 @@ const UserSchema = new mongoose.Schema({
 	password: {
 		type: String,
 		select: false // Exclude by default
-	}
+	},
+	groupIds: [String]
 });
 
 UserSchema.pre('save', function (next) {
