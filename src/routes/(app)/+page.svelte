@@ -200,7 +200,6 @@
 				createdBy: new Types.ObjectId('6565fcf005ac129c4a659284'),
 				createdAt: new Date(),
 				updatedAt: new Date(),
-				matches: []
 			};
 			if (selectedId == '') {
 				series = [newSeries, ...series];
