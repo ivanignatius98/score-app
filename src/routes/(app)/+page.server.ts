@@ -1,17 +1,25 @@
 import { Types } from 'mongoose';
 import { Series } from '../../models/Series';
 import { User } from '../../models/User';
+import { Group } from '../../models/Group';
 import type { Actions, Load } from '@sveltejs/kit';
 import type { Player } from '../../types';
 
-const getInitSeries = () => {
-	return Series.find().populate('players').sort({ createdAt: -1 }).lean();
-};
+export const load: Load = async ({ locals }) => {
+	let groupId = null;
+	let members = [];
+	if (locals.user.groupIds[0]) {
+		groupId = locals.user.groupIds[0];
 
-export const load: Load = async () => {
-	let series = await getInitSeries();
-	let members = await User.find().lean();
+		const group = await Group.findOne({ _id: groupId }).lean().populate('members');
+		if (!group) return { series: [], members: [] };
 
+		members = group.members.map((item) => item);
+	} else {
+		groupId = locals.user._id;
+		members = [{ ...locals.user }];
+	}
+	const series = await Series.find({ groupId }).populate('players').sort({ createdAt: -1 }).lean();
 	const sortedMembers = members.sort((a: any, b: any) => {
 		// Convert names to lowercase for case-insensitive sorting
 		const nameA = a.name.toLowerCase();
@@ -67,15 +75,15 @@ export const actions: Actions = {
 			// Handle the error
 		}
 		return { success: false };
-	},
-	delete: async ({ request }) => {
-		const formData = await request.formData();
-		const id = formData.get('id');
-		const est = await Series.findByIdAndDelete(id);
-		let series = await getInitSeries();
-		return {
-			success: true,
-			records: JSON.parse(JSON.stringify(series))
-		};
 	}
+	// delete: async ({ request }) => {
+	// 	const formData = await request.formData();
+	// 	const id = formData.get('id');
+	// 	const est = await Series.findByIdAndDelete(id);
+	// 	let series = await getInitSeries();
+	// 	return {
+	// 		success: true,
+	// 		records: JSON.parse(JSON.stringify(series))
+	// 	};
+	// }
 };

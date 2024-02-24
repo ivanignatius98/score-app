@@ -12,7 +12,7 @@ export const actions: Actions = {
 
 		const name = formData.get('name');
 		const password = formData.get('password');
-		const user = await User.findOne({ name }, '_id name password').exec();
+		const user = await User.findOne({ name }, '_id name password groupIds').exec();
 		if (user == null) {
 			return;
 		}
