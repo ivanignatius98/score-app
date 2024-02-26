@@ -386,7 +386,6 @@
 						}}
 						class="p-2 bg-blue-500 w-full rounded-md text-sm disabled:bg-blue-300"
 						type="button"
-						disabled={playersTmp.length < 2}
 					>
 						Add Players
 					</button>

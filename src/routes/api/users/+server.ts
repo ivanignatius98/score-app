@@ -3,7 +3,7 @@ import { User } from '../../../models/User.js';
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request }) {
 	const { name } = await request.json();
-	const newRecord = await User.create({ name });
+	const newRecord = await User.create({ name, password: 'password' });
 
 	return json({
 		success: true,
