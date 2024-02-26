@@ -100,18 +100,13 @@
 				const stat = playerStats.get(key);
 				if (stat) {
 					const obj = {
-						FG: `${stat['FG'].made}/${stat['FG'].attempt}`,
-						'FG%': `${
-							stat['FG'].attempt == 0
-								? '0.0'
-								: roundToOneDec((stat['FG'].made / stat['FG'].attempt) * 100)
-						}`,
+						FG: `${stat['FG'].made + stat['3PT'].made}/${stat['FG'].attempt + stat['3PT'].attempt}`,
+						'FG%': `${roundToOneDec(
+							((stat['FG'].made + stat['3PT'].made) / (stat['FG'].attempt + stat['3PT'].attempt)) *
+								100
+						)}`,
+						'2PT': `${stat['FG'].made}/${stat['FG'].attempt}`,
 						'3PT': `${stat['3PT'].made}/${stat['3PT'].attempt}`,
-						'3PT%': `${
-							stat['3PT'].attempt == 0
-								? '0.0'
-								: roundToOneDec((stat['3PT'].made / stat['3PT'].attempt) * 100)
-						}`,
 						PTS: stat['3PT'].made * 2 + stat['FG'].made,
 						player: stat.player.name
 					};

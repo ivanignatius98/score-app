@@ -15,7 +15,9 @@
 			<td class="px-2 min-w-[42px] text-center">3PT</td>
 			<!-- <td class="px-2 min-w-[42px] text-center">3PT%</td> -->
 			<td class="px-2 min-w-[42px] text-center">POINTS</td>
-			<td class="px-2 min-w-[42px] text-center">GAMES</td>
+			{#if data[0]['games']}
+				<td class="px-2 min-w-[42px] text-center">GAMES</td>
+			{/if}
 			{#if data[0]['PPG']}
 				<td class="px-2 min-w-[42px] text-center">PPG</td>
 			{/if}
