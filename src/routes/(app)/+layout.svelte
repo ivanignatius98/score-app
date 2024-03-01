@@ -3,14 +3,12 @@
 	import Navbar from '../Navbar.svelte';
 
 	import { getInitials } from '../../helpers/general.js';
-	export let sidebarOpen = true;
 	const classNames = (...classes: string[]) => {
 		return classes.filter(Boolean).join(' ');
 	};
 
 	export let data;
 
-	// If returning from different website, runs once (as it's an SPA) to restore user session if session cookie is still valid
 	const { user } = data;
 	let groups = [...user.groupIds, user] || [];
 </script>
@@ -32,14 +30,14 @@
 													item.current
 														? 'bg-indigo-600 text-white'
 														: 'text-gray-300  hover:text-white',
-													'ring-1 bg-gray-800 hover:bg-indigo-600 w-12 h-12 transition-all duration-300 ease-in-out rounded-[48px] group-hover:rounded-md flex justify-center items-center'
+													'ring-1 bg-gray-800 hover:bg-indigo-600 w-12 h-12 transition-all duration-300 ease-in-out rounded-[48px] group-hover:rounded-md flex justify-center items-center font-semibold'
 												)}
 											>
 												{getInitials(item.name)[0]}
 											</span>
 										</a>
 										<div
-											class="z-50 min-w-[120px] opacity-0 bg-gray-800 text-white text-sm rounded-md py-2 px-4 absolute top-1/2 left-full transform -translate-y-1/2 transition-opacity duration-300 ease-in-out pointer-events-none group-hover:opacity-100"
+											class="z-50 min-w-[120px] opacity-0 bg-gray-800 text-white text-sm rounded-md py-2 px-4 absolute top-1/2 left-16 transform -translate-y-1/2 transition-opacity duration-300 ease-in-out pointer-events-none group-hover:opacity-100"
 										>
 											{item.name}
 										</div>
@@ -68,7 +66,7 @@
 											>
 										</div>
 										<div
-											class="z-50 min-w-[120px] opacity-0 bg-gray-800 text-white text-sm rounded-md py-2 px-4 absolute top-1/2 left-full transform -translate-y-1/2 transition-opacity duration-300 ease-in-out pointer-events-none group-hover:opacity-100"
+											class="z-50 min-w-[120px] opacity-0 bg-gray-800 text-white text-sm rounded-md py-2 px-4 absolute top-1/2 left-16 transform -translate-y-1/2 transition-opacity duration-300 ease-in-out pointer-events-none group-hover:opacity-100"
 										>
 											Add a new Group
 										</div>
@@ -81,15 +79,15 @@
 			</div>
 
 			<div class="flex-shrink-0 flex p-4">
-				<a href="#" class="flex-shrink-0 w-full group block">
-					<div class="flex items-center">
-						<div class="ml-3">
-							<p class="text-sm font-medium text-white">{user.name}</p>
-							<p class="text-xs font-medium text-gray-300 group-hover:text-gray-200">
-								View profile
-							</p>
-						</div>
+				<a href="#" class="flex-shrink-0 w-full block">
+					<div
+						class="text-gray-300 hover:text-white ring-1 bg-indigo-600 w-12 h-12 transition-all duration-300 ease-in-out rounded-[48px] flex justify-center items-center font-semibold"
+					>
+						{getInitials(user.name)[0]}
 					</div>
+					<p class="text-xs font-medium text-gray-300 group-hover:text-gray-200 text-center mt-2">
+						You
+					</p>
 				</a>
 			</div>
 		</div>

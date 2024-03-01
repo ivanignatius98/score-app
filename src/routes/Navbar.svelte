@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { navbarStore } from '../stores/navbar.ts';
 	import type { NavValue } from '../types';
 	let navValue: NavValue = {
