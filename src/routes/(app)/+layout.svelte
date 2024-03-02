@@ -3,6 +3,7 @@
 	import Navbar from '../Navbar.svelte';
 
 	import { getInitials } from '../../helpers/general.js';
+	import { page } from '$app/stores';
 	const classNames = (...classes: string[]) => {
 		return classes.filter(Boolean).join(' ');
 	};
@@ -11,6 +12,19 @@
 
 	const { user } = data;
 	let groups = [...user.groupIds, user] || [];
+
+	let currGroupId: string | null = null;
+
+	$: queryParams = $page.url.searchParams;
+	$: if (queryParams.get('group')) {
+		currGroupId = queryParams.get('group');
+	} else {
+		if (user.groupIds) {
+			currGroupId = user.groupIds[0]._id;
+		} else {
+			currGroupId = user._id;
+		}
+	}
 </script>
 
 <div class="app bg-gray-900 text-white">
@@ -27,8 +41,8 @@
 										<a href={`/?group=${item._id}`}>
 											<span
 												class={classNames(
-													item.current
-														? 'bg-indigo-600 text-white'
+													item._id == currGroupId
+														? 'bg-indigo-600 text-white rounded-md '
 														: 'text-gray-300  hover:text-white',
 													'ring-1 bg-gray-800 hover:bg-indigo-600 w-12 h-12 transition-all duration-300 ease-in-out rounded-[48px] group-hover:rounded-md flex justify-center items-center font-semibold'
 												)}
