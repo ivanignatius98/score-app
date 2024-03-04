@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
-import { Series } from '../../../models/Series.js';
-import { Group } from '../../../models/Group.js';
+import { Series } from '../../../../models/Series.js';
+import { Group } from '../../../../models/Group.js';
 // import type { Player, StatMap, Match as MatchType } from '../../../../types/index.js';
 // import type { Schema } from 'mongoose';
 
