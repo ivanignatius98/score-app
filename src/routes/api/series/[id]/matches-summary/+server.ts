@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
-import { Stat } from '../../../../../../models/Stat.js';
-import { Series } from '../../../../../../models/Series.js';
-import type { Player, StatMap, Match as MatchType } from '../../../../../../types/index.js';
+import { Stat } from '../../../../../models/Stat.js';
+import { Series } from '../../../../../models/Series.js';
+import type { Player, StatMap, Match as MatchType } from '../../../../../types/index.js';
 import type { Schema } from 'mongoose';
 
 /** @type {import('./$types').RequestHandler} */

@@ -1,38 +1,17 @@
 import { Types } from 'mongoose';
-import { Group } from '../../models/Group';
 import { Series } from '../../models/Series';
 import { User } from '../../models/User';
 import type { Actions, Load } from '@sveltejs/kit';
 import type { Player } from '../../types';
 
-export const load: Load = async ({ locals, url }) => {
-	if (!locals.user) return;
-	const groupParam = url.searchParams.get('group');
+const getInitSeries = () => {
+	return Series.find().populate('players').sort({ createdAt: -1 }).lean();
+};
 
-	let groupId = null;
-	let members = [];
-	if (!groupParam) {
-		if (locals.user.groupIds) {
-			groupId = locals.user.groupIds[0];
-		} else {
-			groupId = locals.user._id;
-		}
-	} else {
-		groupId = groupParam;
-	}
+export const load: Load = async () => {
+	let series = await getInitSeries();
+	let members = await User.find().lean();
 
-	if (groupId != locals.user._id) {
-		const group = await Group.findOne({ _id: groupId }).lean().populate('members');
-		if (!group) {
-			return { series: [], members: [] };
-		}
-
-		members = group.members.map((item) => item);
-	} else {
-		members = [{ ...locals.user }];
-	}
-
-	const series = await Series.find({ groupId }).populate('players').sort({ createdAt: -1 }).lean();
 	const sortedMembers = members.sort((a: any, b: any) => {
 		// Convert names to lowercase for case-insensitive sorting
 		const nameA = a.name.toLowerCase();
@@ -51,8 +30,7 @@ export const load: Load = async ({ locals, url }) => {
 	}
 	return {
 		series: JSON.parse(JSON.stringify(series)),
-		members: JSON.parse(JSON.stringify(sortedMembers)),
-		groupId
+		members: JSON.parse(JSON.stringify(sortedMembers))
 	};
 };
 
@@ -65,7 +43,6 @@ export const actions: Actions = {
 		const { _id, players, ...newSave } = parsed;
 		const arrIdPlayers = players.map(({ _id }: Player) => new Types.ObjectId(_id));
 		newSave.players = arrIdPlayers;
-
 		if (_id) {
 			series = await Series.findOne({ _id });
 			if (series) {
@@ -80,7 +57,7 @@ export const actions: Actions = {
 
 		try {
 			const records = series ? await series.save() : [];
-			// console.log('Series saved successfully:', records);
+			console.log('Series saved successfully:', records);
 			return {
 				success: true,
 				records: JSON.parse(JSON.stringify(records))
@@ -90,15 +67,15 @@ export const actions: Actions = {
 			// Handle the error
 		}
 		return { success: false };
+	},
+	delete: async ({ request }) => {
+		const formData = await request.formData();
+		const id = formData.get('id');
+		const est = await Series.findByIdAndDelete(id);
+		let series = await getInitSeries();
+		return {
+			success: true,
+			records: JSON.parse(JSON.stringify(series))
+		};
 	}
-	// delete: async ({ request }) => {
-	// 	const formData = await request.formData();
-	// 	const id = formData.get('id');
-	// 	const est = await Series.findByIdAndDelete(id);
-	// 	let series = await getInitSeries();
-	// 	return {
-	// 		success: true,
-	// 		records: JSON.parse(JSON.stringify(series))
-	// 	};
-	// }
 };
