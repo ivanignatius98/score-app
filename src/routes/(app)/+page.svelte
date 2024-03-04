@@ -16,17 +16,18 @@
 
 	export let data;
 
+	const { user } = data;
 	let series: (Series & { _id?: string })[] = [];
 	let members: Player[] = [];
+	let currGroupId: string | null = null;
 	let selectedId = '';
 	let playerq = '';
 	let showSidePanel = false;
 	let openModal = false;
 	let showDropdown = false;
-
+	let initial = true;
 	const currentDate = new Date();
 	const [formattedDate] = currentDate.toISOString().split('T');
-
 	function init() {
 		navbarStore.update((current: NavValue) => ({
 			...current,
@@ -50,7 +51,7 @@
 
 		series = data.series || [];
 		members = data.members || [];
-
+		currGroupId = data.groupId;
 		seriesDate = formattedDate;
 		// delete later
 		// showSidePanel = true;
@@ -159,17 +160,81 @@
 			members = [record, ...members];
 		}
 	};
+
+	import { page } from '$app/stores';
+	import { list } from '../../services/series/index.ts';
+
+	// Reactive statement to respond to query param changes
+	$: queryParams = $page.url.searchParams;
+	$: if (!initial) {
+		const groupValue = queryParams.get('group') ?? '';
+		loadDataBasedOnQueryParam(groupValue);
+	} else {
+		initial = false;
+	}
+	let dataLoading = false;
+	async function loadDataBasedOnQueryParam(value: string) {
+		dataLoading = true;
+		const record = await list(value);
+		if (record.success) {
+			series = [...record.series];
+			members = [...record.members];
+			currGroupId = record.groupId;
+		}
+		dataLoading = false;
+	}
 </script>
 
 <div class="flow-root mt-6">
 	<ul role="list" class="-my-5 divide-y divide-gray-800">
+		{#if dataLoading}
+			<div
+				role="status"
+				class="w-full p-4 space-y-4 divide-y divide-gray-700 rounded shadow animate-pulse"
+			>
+				<div class="flex items-center justify-between">
+					<div>
+						<div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
+						<div class="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+					</div>
+					<div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
+				</div>
+				<div class="flex items-center justify-between pt-4">
+					<div>
+						<div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
+						<div class="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+					</div>
+					<div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
+				</div>
+				<div class="flex items-center justify-between pt-4">
+					<div>
+						<div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
+						<div class="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+					</div>
+					<div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
+				</div>
+				<div class="flex items-center justify-between pt-4">
+					<div>
+						<div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
+						<div class="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+					</div>
+					<div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
+				</div>
+				<div class="flex items-center justify-between pt-4">
+					<div>
+						<div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
+						<div class="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+					</div>
+					<div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
+				</div>
+				<span class="sr-only">Loading...</span>
+			</div>
+		{/if}
 		{#each series as row}
-			<li>
-				<ListItem
-					item={{ ...row, desc: new Date(row.date).toDateString() }}
-					on:itemClicked={handleItemClicked}
-				/>
-			</li>
+			<ListItem
+				item={{ ...row, desc: new Date(row.date).toDateString() }}
+				on:itemClicked={handleItemClicked}
+			/>
 		{/each}
 	</ul>
 </div>
@@ -192,17 +257,24 @@
 		action="?/store"
 		use:enhance={({ formData, cancel }) => {
 			const name = String(formData.get('name'));
-			const newSeries = {
+			const defaultSeries = {
 				_id: selectedId || '',
 				name,
 				players,
 				date: seriesDate,
-				createdBy: new Types.ObjectId('6565fcf005ac129c4a659284'),
-				createdAt: new Date(),
-				updatedAt: new Date(),
+				groupId: currGroupId,
+				updatedAt: new Date()
 			};
+
+			let seriesToSave = { ...defaultSeries };
 			if (selectedId == '') {
-				series = [newSeries, ...series];
+				seriesToSave = {
+					...seriesToSave,
+					matches: [],
+					createdBy: new Types.ObjectId(user._id),
+					createdAt: new Date()
+				};
+				series = [defaultSeries, ...series];
 			} else {
 				const index = series.findIndex((item) => item._id === selectedId);
 				if (index == -1) {
@@ -210,10 +282,10 @@
 					return;
 				}
 				const newArray = [...series];
-				newArray[index] = { ...newArray[index], ...newSeries };
+				newArray[index] = { ...newArray[index], ...defaultSeries };
 				series = newArray;
 			}
-			formData.append('data', JSON.stringify(newSeries));
+			formData.append('data', JSON.stringify(seriesToSave));
 			isLoading = true;
 			let redir = '';
 			return async ({ update, result }) => {

@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
-import { Match } from "../../../models/Match.js";
-import { Stat } from "../../../models/Stat.js";
+import { Match } from "../../../../models/Match.js";
+import { Stat } from "../../../../models/Stat.js";
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request }) {
 	const { match_id, action, person } = await request.json();
