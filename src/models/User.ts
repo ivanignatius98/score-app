@@ -8,7 +8,11 @@ const UserSchema = new mongoose.Schema({
 		type: String,
 		select: false // Exclude by default
 	},
-	groupIds: [String]
+  groupIds: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Group',
+    default: []
+  }],
 });
 
 UserSchema.pre('save', function (next) {

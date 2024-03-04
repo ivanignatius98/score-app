@@ -1,5 +1,6 @@
 import { redirect, type Actions } from '@sveltejs/kit';
 import { User } from '../../../models/User';
+import { Group } from '../../../models/Group';
 import { SECRET_KEY } from '$env/static/private';
 
 import jwt from 'jsonwebtoken';
@@ -12,7 +13,7 @@ export const actions: Actions = {
 
 		const name = formData.get('name');
 		const password = formData.get('password');
-		const user = await User.findOne({ name }, '_id name password').exec();
+		const user = await User.findOne({ name }, '_id name password groupIds').populate("groupIds").exec();
 		if (user == null) {
 			return;
 		}
