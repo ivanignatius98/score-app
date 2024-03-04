@@ -3,11 +3,7 @@ import mongoose, { Schema } from 'mongoose';
 const SeriesSchema = new mongoose.Schema({
   name: String,
   date: Date,
-  groupId: {
-    type: Schema.Types.ObjectId,
-    ref: 'Group',
-    default: []
-  },
+  groupId: String,
   players: [{
     type: Schema.Types.ObjectId,
     ref: 'User'
