@@ -164,7 +164,6 @@
 	import { page } from '$app/stores';
 	import { list } from '../../services/series/index.ts';
 
-	// Reactive statement to respond to query param changes
 	$: queryParams = $page.url.searchParams;
 	$: if (!initial) {
 		const groupValue = queryParams.get('group') ?? '';
