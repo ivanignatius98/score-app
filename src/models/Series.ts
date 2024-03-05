@@ -6,7 +6,6 @@ const SeriesSchema = new mongoose.Schema({
   groupId: {
     type: Schema.Types.ObjectId,
     ref: 'Group',
-    default: []
   },
   players: [{
     type: Schema.Types.ObjectId,
