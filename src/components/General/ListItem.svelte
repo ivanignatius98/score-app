@@ -1,7 +1,17 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
+	import DropdownMenu from './DropdownMenu.svelte';
 	const dispatch = createEventDispatcher();
 	export let item: any | null = null;
+	interface DropdownItem {
+		label: string;
+		link: string;
+	}
+	const items: DropdownItem[] = [
+		{ label: 'Option 1', link: '/option1' },
+		{ label: 'Option 2', link: '/option2' },
+		{ label: 'Option 3', link: '/option3' }
+	];
 </script>
 
 {#if item != null}
@@ -28,5 +38,7 @@
 		>
 			<path stroke-width="2" d="M.293 0l22 22-22 22h1.414l22-22-22-22H.293z" />
 		</svg>
+
+		<DropdownMenu {items} direction="up" />
 	</div>
 {/if}
