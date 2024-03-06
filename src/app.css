@@ -1,3 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* global.css */
+
+/* WebKit-based browsers (Chrome, Safari, Opera) */
+::-webkit-scrollbar {
+  width: 8px; /* Set desired scrollbar width */
+  background-color: transparent; /* Transparent background for the scrollbar track */
+}
+
+/* Other browsers */
+* {
+  scrollbar-width: thin; /* Set scrollbar width to 'thin' */
+  scrollbar-color: #606060 transparent; /* Set scrollbar color and track color */
+}
+
+/* Scrollbar thumb (the part you can grab and drag) */
+::-webkit-scrollbar-thumb {
+  background-color: #606060; /* Set desired scrollbar color */
+  border-radius: 6px; /* Set desired scrollbar border radius */
+}
+
+/* Optional: Show scrollbar on hover */
+:hover::-webkit-scrollbar-thumb {
+  background-color: #808080; /* Set desired scrollbar color on hover */
+}
