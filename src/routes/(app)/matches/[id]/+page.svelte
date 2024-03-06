@@ -175,7 +175,7 @@
 	//#endregion
 </script>
 
-<div class="flow-root mt-6">
+<div class="flow-root my-6">
 	<ul role="list" class="-my-5 divide-y divide-gray-800">
 		{#each matches as match}
 			<li>
