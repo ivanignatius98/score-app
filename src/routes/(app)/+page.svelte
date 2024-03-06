@@ -2,12 +2,10 @@
 	import { Types } from 'mongoose';
 	import Modal from '../../components/General/Modal.svelte';
 	import SlideOver from '../../components/General/SlideOver.svelte';
-	import ListItem from '../../components/General/ListItem.svelte';
 	import { navbarStore } from '../../stores/navbar.ts';
 	import type { NavValue, Player, Series } from '../../types/index.ts';
 	import { getInitials } from '../../helpers/general.js';
 	import { enhance } from '$app/forms';
-	import Dropdown from '../../components/General/Dropdown.svelte';
 	import { saveAction } from '../../services/user/index.ts';
 	import { goto } from '$app/navigation';
 	let name = '';
@@ -24,7 +22,6 @@
 	let playerq = '';
 	let showSidePanel = false;
 	let openModal = false;
-	let showDropdown = false;
 	let initial = true;
 	const currentDate = new Date();
 	const [formattedDate] = currentDate.toISOString().split('T');
@@ -72,7 +69,6 @@
 			players = [];
 			playerIds = new Set([]);
 			selectedId = '';
-			showDropdown = false;
 		}
 		if (!openModal) {
 			playerq = '';
@@ -163,6 +159,7 @@
 
 	import { page } from '$app/stores';
 	import { list } from '../../services/series/index.ts';
+	import SeriesItem from './SeriesItem.svelte';
 
 	// Reactive statement to respond to query param changes
 	$: queryParams = $page.url.searchParams;
@@ -231,10 +228,7 @@
 			</div>
 		{/if}
 		{#each series as row}
-			<ListItem
-				item={{ ...row, desc: new Date(row.date).toDateString() }}
-				on:itemClicked={handleItemClicked}
-			/>
+			<SeriesItem {row} on:itemClicked={handleItemClicked} />
 		{/each}
 	</ul>
 </div>
@@ -498,47 +492,6 @@
 			</button> -->
 			{#if selectedId}
 				<input name="id" type="hidden" bind:value={selectedId} />
-				<Dropdown bind:showDropdown>
-					<button
-						slot="button-activator"
-						on:click={() => (showDropdown = !showDropdown)}
-						type="button"
-						class="h-9 w-9 bg-gray-600 hover:bg-gray-500 p-2 rounded-lg"
-					>
-						<span class="sr-only">actions</span>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 20 20"
-							fill="currentColor"
-							aria-hidden="true"
-							class="nz sb"
-							><path
-								d="M10 3a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM10 8.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM11.5 15.5a1.5 1.5 0 10-3 0 1.5 1.5 0 003 0z"
-							></path></svg
-						>
-					</button>
-					<div
-						role="none"
-						slot="dropdown-items"
-						class="origin-bottom-right absolute z-10 right-0 bottom-14 mt-2 w-32 bg-gray-800 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-						tabindex="-1"
-					>
-						<a
-							href={`/matches/${selectedId}`}
-							class="block px-4 py-2 text-sm hover:bg-gray-700 rounded-t-lg"
-							role="menuitem"
-							tabindex="-1"
-							id="user-menu-item-0">View Series</a
-						>
-
-						<button
-							disabled={true}
-							formaction="?/delete"
-							class="w-full px-4 py-2 text-sm bg-red-800 hover:bg-red-700 rounded-b-lg text-left disabled:bg-red-300"
-							>Delete</button
-						>
-					</div>
-				</Dropdown>
 			{/if}
 		</div>
 	</form>
