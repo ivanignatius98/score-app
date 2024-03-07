@@ -1,4 +1,5 @@
 import { json } from '@sveltejs/kit';
+import { Match } from '../../../../../../models/Match.js';
 import { Stat } from '../../../../../../models/Stat.js';
 import { Series } from '../../../../../../models/Series.js';
 import type { Player, StatMap, Match as MatchType } from '../../../../../../types/index.js';
@@ -105,6 +106,8 @@ export async function GET({ params }) {
 
 	return json({
 		success: true,
-		record: arr.sort((a: any, b: any) => b.PPG - a.PPG)
+		dataMap: Object.fromEntries(dataMap),
+		summ,
+		matchCountMap: Object.fromEntries(matchCountMap)
 	});
 }
