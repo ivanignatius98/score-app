@@ -138,7 +138,8 @@
 
 	const handleAddNewUser = async () => {
 		const { success, record } = await saveAction({
-			name: playerq
+			name: playerq,
+			groupId: currGroupId
 		});
 		if (success) {
 			playerIds = new Set([record._id, ...playerIdsTmp]);

@@ -2,8 +2,8 @@ import { json } from '@sveltejs/kit';
 import { User } from '../../../../models/User.js';
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request }) {
-	const { name } = await request.json();
-	const newRecord = await User.create({ name, password: 'password' });
+	const { name, groupId } = await request.json();
+	const newRecord = await User.create({ name, password: 'password', groupIds: [groupId] });
 
 	return json({
 		success: true,
