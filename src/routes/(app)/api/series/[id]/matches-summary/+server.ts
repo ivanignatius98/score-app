@@ -83,7 +83,7 @@ export async function GET({ params }) {
 		// 		? '0.0'
 		// 		: roundToOneDec((value['3PT'].made / value['3PT'].attempt) * 100);
 
-		const pts = value['FG'].made + value['3PT'].made * 2;
+		const pts = value['FG'].made * 2 + value['3PT'].made * 3;
 		const games = matchCountMap.get(key);
 
 		arr.push({
