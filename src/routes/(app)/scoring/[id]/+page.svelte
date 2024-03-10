@@ -152,7 +152,12 @@
 		match.status = newStatus;
 		currTab = newStatus == 'archived' ? 'teamA' : 'playbyplay';
 
-		const { success, res } = await updateMatchStatus(match?._id);
+		const { success, res } = await updateMatchStatus({
+			_id: match._id,
+			status: newStatus,
+			aPoints,
+			bPoints
+		});
 
 		if (success && match) {
 			match.status = res;

@@ -1,13 +1,12 @@
 <script>
 	import { onMount } from 'svelte';
 
-	let landscapeMode = false;
+	// let landscapeMode = false;
 	let showPrompt = false;
 
 	onMount(() => {
 		const handleOrientation = () => {
 			showPrompt = window.innerWidth < 512 && window.innerWidth < window.innerHeight;
-			console.log(window.innerWidth);
 			// showPrompt = !landscapeMode && isMobile();
 		};
 
