@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { User } from '../../../../models/User.js';
+import { User } from '../../../models/User.js';
 /** @type {import('./$types').RequestHandler} */
 export async function POST({ request }) {
 	const { name, groupId } = await request.json();
