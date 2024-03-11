@@ -309,328 +309,331 @@
 			</span>
 		</div>
 	</div>
-	<div class="justify-center flex text-sm">
-		<menu class="min-w-[100px]">
-			{#each aPlayers as person}
-				<li>
-					<button
-						type="button"
-						on:click={() => {
-							handlePlayerSelect('a', person);
-						}}
-						class={classNames(
-							selectedPlayer?._id == person._id
-								? 'bg-indigo-700 hover:bg-indigo-800'
-								: ' bg-gray-800 hover:bg-gray-700',
-							'w-full my-2 p-4 items-center border border-transparent rounded-md shadow-sm text-white'
-						)}
-					>
-						{person.name}
-					</button>
-				</li>
-			{/each}
-		</menu>
-		<div class="flex-1 p-2">
-			<svg
-				id="Layer_2"
-				data-name="Layer 2"
-				xmlns="http://www.w3.org/2000/svg"
-				viewBox="0 0 742 492.56"
-				class="stroke-gray-900 stroke-[8px] fill-gray-700"
-			>
-				<g id="Layer_1-2" data-name="Layer 1">
-					<rect
-						class={classNames(
-							currColorHover,
-							currZone == 'RIGHT-ELBOW' ? currColor : '',
-							'transition-colors duration-300 outline-none border-none'
-						)}
-						on:click={() => handleZoneClicked('RIGHT-ELBOW')}
-						x="452.02"
-						y="101.08"
-						width="217.36"
-						height="264.32"
-						on:keydown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								handleZoneClicked('RIGHT-ELBOW');
-							}
-						}}
-						tabindex="0"
-						role="button"
-						aria-label="Right Elbow Area"
-					/>
-					<rect
-						class={classNames(
-							currColorHover,
-							currZone == 'LEFT-ELBOW' ? currColor : '',
-							'transition-colors duration-300 outline-none border-none'
-						)}
-						on:click={() => handleZoneClicked('LEFT-ELBOW')}
-						x="70.61"
-						y="101.08"
-						width="217.36"
-						height="264.32"
-						on:keydown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								handleZoneClicked('LEFT-ELBOW');
-							}
-						}}
-						tabindex="0"
-						role="button"
-						aria-label="Right Elbow Area"
-					/>
-					<rect
-						class={classNames(
-							currColorHover,
-							currZone == 'FREE-THROW' ? currColor : '',
-							'transition-colors duration-300 outline-none border-none'
-						)}
-						on:click={() => handleZoneClicked('FREE-THROW')}
-						x="288.39"
-						y="237.06"
-						width="161.62"
-						height="113.81"
-						on:keydown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								handleZoneClicked('FREE-THROW');
-							}
-						}}
-						tabindex="0"
-						role="button"
-						aria-label="Right Elbow Area"
-					/>
-					<rect
-						class={classNames(
-							currColorHover,
-							currZone == 'LEFT-CORNER' ? currColor : '',
-							'transition-colors duration-300 outline-none border-none '
-						)}
-						on:click={() => handleZoneClicked('LEFT-CORNER')}
-						x="4"
-						y="4"
-						width="66.61"
-						height="194.16"
-						on:keydown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								handleZoneClicked('LEFT-CORNER');
-							}
-						}}
-						tabindex="0"
-						role="button"
-						aria-label="Right Elbow Area"
-					/>
-					<rect
-						class={classNames(
-							currColorHover,
-							currZone == 'RIGHT-CORNER' ? currColor : '',
-							'transition-colors duration-300 outline-none border-none '
-						)}
-						on:click={() => handleZoneClicked('RIGHT-CORNER')}
-						x="671.39"
-						y="4"
-						width="66.61"
-						height="194.16"
-						on:keydown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								handleZoneClicked('RIGHT-CORNER');
-							}
-						}}
-						tabindex="0"
-						role="button"
-						aria-label="Right Corner Area"
-					/>
-					<rect
-						class={classNames(
-							currColorHover,
-							currZone == 'SHORT-LEFT-CORNER' ? currColor : '',
-							'transition-colors duration-300 outline-none border-none '
-						)}
-						on:click={() => handleZoneClicked('SHORT-LEFT-CORNER')}
-						x="70.61"
-						y="4"
-						width="189.21"
-						height="97.08"
-						on:keydown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								handleZoneClicked('SHORT-LEFT');
-							}
-						}}
-						tabindex="0"
-						role="button"
-						aria-label="Short Left Corner Area"
-					/>
-					<rect
-						class={classNames(
-							currColorHover,
-							currZone == 'SHORT-RIGHT-CORNER' ? currColor : '',
-							'transition-colors duration-300 outline-none border-none '
-						)}
-						on:click={() => handleZoneClicked('SHORT-RIGHT-CORNER')}
-						x="478.59"
-						y="4"
-						width="192.8"
-						height="97.08"
-						on:keydown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								handleZoneClicked('SHORT-RIGHT-CORNER');
-							}
-						}}
-						tabindex="0"
-						role="button"
-						aria-label="Short Right Corner Area"
-					/>
-					<rect
-						class={classNames(
-							currColorHover,
-							currZone == 'LEFT-LOW-POST' ? currColor : '',
-							'transition-colors duration-300 outline-none border-none'
-						)}
-						on:click={() => handleZoneClicked('LEFT-LOW-POST')}
-						x="259.82"
-						y="4"
-						width="28.16"
-						height="253.28"
-						on:keydown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								handleZoneClicked('LEFT-LOW-POST');
-							}
-						}}
-						tabindex="0"
-						role="button"
-						aria-label="Left Low Post Area"
-					/>
-					<path
-						class={classNames(
-							currColorHover,
-							currZone == 'LEFT-WING' ? currColor : '',
-							'transition-colors duration-300 outline-none border-none'
-						)}
-						on:click={() => handleZoneClicked('LEFT-WING')}
-						d="M235.6,365.4l-62.79,123.16H4V198.16h66.61s55.19,121.07,164.99,167.25Z"
-						on:keydown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								handleZoneClicked('LEFT-WING');
-							}
-						}}
-						tabindex="0"
-						role="button"
-						aria-label="Left Wing Area"
-					/>
-					<path
-						class={classNames(
-							currColorHover,
-							currZone == 'RIGHT-WING' ? currColor : '',
-							'transition-colors duration-300 outline-none border-none'
-						)}
-						on:click={() => handleZoneClicked('RIGHT-WING')}
-						d="M506.4,365.4l62.79,123.16h168.81s0-290.41,0-290.41h-66.61s-55.19,121.07-164.99,167.25Z"
-						on:keydown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								handleZoneClicked('RIGHT-WING');
-							}
-						}}
-						tabindex="0"
-						role="button"
-						aria-label="Right Wing Area"
-					/>
-					<path
-						class={classNames(
-							currColorHover,
-							currZone == 'POINT' ? currColor : '',
-							'transition-colors duration-300 outline-none border-none'
-						)}
-						on:click={() => handleZoneClicked('POINT')}
-						d="M173.28,488.56h395.91s-62.79-123.16-62.79-123.16c0,0-95.67,67.57-270.8,0-11.66,22.86-62.32,123.16-62.32,123.16Z"
-						on:keydown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								handleZoneClicked('POINT');
-							}
-						}}
-						tabindex="0"
-						role="button"
-						aria-label="Point Area"
-					/>
-					<path
-						class={classNames(
-							currColorHover,
-							currZone == 'HIGH-POST' ? currColor : '',
-							'transition-colors duration-300 outline-none border-none'
-						)}
-						on:click={() => handleZoneClicked('HIGH-POST')}
-						d="M235.6,365.4l52.37-104.74s8.73,76.58,81.23,76.02c0,0,73.63,3.94,80.95-79.4,12.95,24.21,56.25,108.12,56.25,108.12,0,0-95.1,67.01-270.8,0Z"
-						on:keydown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								handleZoneClicked('HIGH-POST');
-							}
-						}}
-						tabindex="0"
-						role="button"
-						aria-label="High Post Area"
-					/>
-					<rect
-						class={classNames(
-							currColorHover,
-							currZone == 'PAINT' ? currColor : '',
-							'transition-colors duration-300 outline-none border-none'
-						)}
-						on:click={() => handleZoneClicked('PAINT')}
-						x="287.97"
-						y="4"
-						width="161.62"
-						height="256.66"
-						on:keydown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								handleZoneClicked('PAINT');
-							}
-						}}
-						tabindex="0"
-						role="button"
-						aria-label="Paint Area"
-					/>
-					<rect
-						class={classNames(
-							currColorHover,
-							currZone == 'RIGHT-LOW-POST' ? currColor : '',
-							'transition-colors duration-300 outline-none border-none'
-						)}
-						on:click={() => handleZoneClicked('RIGHT-LOW-POST')}
-						x="449.59"
-						y="4"
-						width="28.16"
-						height="253.28"
-						on:keydown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								handleZoneClicked('RIGHT-LOW-POST');
-							}
-						}}
-						tabindex="0"
-						role="button"
-						aria-label="Right Low Post Area"
-					/>
-				</g>
-			</svg>
+
+	{#if !postGame}
+		<div class="justify-center flex text-sm">
+			<menu class="min-w-[100px]">
+				{#each aPlayers as person}
+					<li>
+						<button
+							type="button"
+							on:click={() => {
+								handlePlayerSelect('a', person);
+							}}
+							class={classNames(
+								selectedPlayer?._id == person._id
+									? 'bg-indigo-700 hover:bg-indigo-800'
+									: ' bg-gray-800 hover:bg-gray-700',
+								'w-full my-2 p-4 items-center border border-transparent rounded-md shadow-sm text-white'
+							)}
+						>
+							{person.name}
+						</button>
+					</li>
+				{/each}
+			</menu>
+			<div class="flex-1 p-2">
+				<svg
+					id="Layer_2"
+					data-name="Layer 2"
+					xmlns="http://www.w3.org/2000/svg"
+					viewBox="0 0 742 492.56"
+					class="stroke-gray-900 stroke-[8px] fill-gray-700"
+				>
+					<g id="Layer_1-2" data-name="Layer 1">
+						<rect
+							class={classNames(
+								currColorHover,
+								currZone == 'RIGHT-ELBOW' ? currColor : '',
+								'transition-colors duration-300 outline-none border-none'
+							)}
+							on:click={() => handleZoneClicked('RIGHT-ELBOW')}
+							x="452.02"
+							y="101.08"
+							width="217.36"
+							height="264.32"
+							on:keydown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									handleZoneClicked('RIGHT-ELBOW');
+								}
+							}}
+							tabindex="0"
+							role="button"
+							aria-label="Right Elbow Area"
+						/>
+						<rect
+							class={classNames(
+								currColorHover,
+								currZone == 'LEFT-ELBOW' ? currColor : '',
+								'transition-colors duration-300 outline-none border-none'
+							)}
+							on:click={() => handleZoneClicked('LEFT-ELBOW')}
+							x="70.61"
+							y="101.08"
+							width="217.36"
+							height="264.32"
+							on:keydown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									handleZoneClicked('LEFT-ELBOW');
+								}
+							}}
+							tabindex="0"
+							role="button"
+							aria-label="Right Elbow Area"
+						/>
+						<rect
+							class={classNames(
+								currColorHover,
+								currZone == 'FREE-THROW' ? currColor : '',
+								'transition-colors duration-300 outline-none border-none'
+							)}
+							on:click={() => handleZoneClicked('FREE-THROW')}
+							x="288.39"
+							y="237.06"
+							width="161.62"
+							height="113.81"
+							on:keydown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									handleZoneClicked('FREE-THROW');
+								}
+							}}
+							tabindex="0"
+							role="button"
+							aria-label="Right Elbow Area"
+						/>
+						<rect
+							class={classNames(
+								currColorHover,
+								currZone == 'LEFT-CORNER' ? currColor : '',
+								'transition-colors duration-300 outline-none border-none '
+							)}
+							on:click={() => handleZoneClicked('LEFT-CORNER')}
+							x="4"
+							y="4"
+							width="66.61"
+							height="194.16"
+							on:keydown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									handleZoneClicked('LEFT-CORNER');
+								}
+							}}
+							tabindex="0"
+							role="button"
+							aria-label="Right Elbow Area"
+						/>
+						<rect
+							class={classNames(
+								currColorHover,
+								currZone == 'RIGHT-CORNER' ? currColor : '',
+								'transition-colors duration-300 outline-none border-none '
+							)}
+							on:click={() => handleZoneClicked('RIGHT-CORNER')}
+							x="671.39"
+							y="4"
+							width="66.61"
+							height="194.16"
+							on:keydown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									handleZoneClicked('RIGHT-CORNER');
+								}
+							}}
+							tabindex="0"
+							role="button"
+							aria-label="Right Corner Area"
+						/>
+						<rect
+							class={classNames(
+								currColorHover,
+								currZone == 'SHORT-LEFT-CORNER' ? currColor : '',
+								'transition-colors duration-300 outline-none border-none '
+							)}
+							on:click={() => handleZoneClicked('SHORT-LEFT-CORNER')}
+							x="70.61"
+							y="4"
+							width="189.21"
+							height="97.08"
+							on:keydown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									handleZoneClicked('SHORT-LEFT');
+								}
+							}}
+							tabindex="0"
+							role="button"
+							aria-label="Short Left Corner Area"
+						/>
+						<rect
+							class={classNames(
+								currColorHover,
+								currZone == 'SHORT-RIGHT-CORNER' ? currColor : '',
+								'transition-colors duration-300 outline-none border-none '
+							)}
+							on:click={() => handleZoneClicked('SHORT-RIGHT-CORNER')}
+							x="478.59"
+							y="4"
+							width="192.8"
+							height="97.08"
+							on:keydown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									handleZoneClicked('SHORT-RIGHT-CORNER');
+								}
+							}}
+							tabindex="0"
+							role="button"
+							aria-label="Short Right Corner Area"
+						/>
+						<rect
+							class={classNames(
+								currColorHover,
+								currZone == 'LEFT-LOW-POST' ? currColor : '',
+								'transition-colors duration-300 outline-none border-none'
+							)}
+							on:click={() => handleZoneClicked('LEFT-LOW-POST')}
+							x="259.82"
+							y="4"
+							width="28.16"
+							height="253.28"
+							on:keydown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									handleZoneClicked('LEFT-LOW-POST');
+								}
+							}}
+							tabindex="0"
+							role="button"
+							aria-label="Left Low Post Area"
+						/>
+						<path
+							class={classNames(
+								currColorHover,
+								currZone == 'LEFT-WING' ? currColor : '',
+								'transition-colors duration-300 outline-none border-none'
+							)}
+							on:click={() => handleZoneClicked('LEFT-WING')}
+							d="M235.6,365.4l-62.79,123.16H4V198.16h66.61s55.19,121.07,164.99,167.25Z"
+							on:keydown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									handleZoneClicked('LEFT-WING');
+								}
+							}}
+							tabindex="0"
+							role="button"
+							aria-label="Left Wing Area"
+						/>
+						<path
+							class={classNames(
+								currColorHover,
+								currZone == 'RIGHT-WING' ? currColor : '',
+								'transition-colors duration-300 outline-none border-none'
+							)}
+							on:click={() => handleZoneClicked('RIGHT-WING')}
+							d="M506.4,365.4l62.79,123.16h168.81s0-290.41,0-290.41h-66.61s-55.19,121.07-164.99,167.25Z"
+							on:keydown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									handleZoneClicked('RIGHT-WING');
+								}
+							}}
+							tabindex="0"
+							role="button"
+							aria-label="Right Wing Area"
+						/>
+						<path
+							class={classNames(
+								currColorHover,
+								currZone == 'POINT' ? currColor : '',
+								'transition-colors duration-300 outline-none border-none'
+							)}
+							on:click={() => handleZoneClicked('POINT')}
+							d="M173.28,488.56h395.91s-62.79-123.16-62.79-123.16c0,0-95.67,67.57-270.8,0-11.66,22.86-62.32,123.16-62.32,123.16Z"
+							on:keydown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									handleZoneClicked('POINT');
+								}
+							}}
+							tabindex="0"
+							role="button"
+							aria-label="Point Area"
+						/>
+						<path
+							class={classNames(
+								currColorHover,
+								currZone == 'HIGH-POST' ? currColor : '',
+								'transition-colors duration-300 outline-none border-none'
+							)}
+							on:click={() => handleZoneClicked('HIGH-POST')}
+							d="M235.6,365.4l52.37-104.74s8.73,76.58,81.23,76.02c0,0,73.63,3.94,80.95-79.4,12.95,24.21,56.25,108.12,56.25,108.12,0,0-95.1,67.01-270.8,0Z"
+							on:keydown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									handleZoneClicked('HIGH-POST');
+								}
+							}}
+							tabindex="0"
+							role="button"
+							aria-label="High Post Area"
+						/>
+						<rect
+							class={classNames(
+								currColorHover,
+								currZone == 'PAINT' ? currColor : '',
+								'transition-colors duration-300 outline-none border-none'
+							)}
+							on:click={() => handleZoneClicked('PAINT')}
+							x="287.97"
+							y="4"
+							width="161.62"
+							height="256.66"
+							on:keydown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									handleZoneClicked('PAINT');
+								}
+							}}
+							tabindex="0"
+							role="button"
+							aria-label="Paint Area"
+						/>
+						<rect
+							class={classNames(
+								currColorHover,
+								currZone == 'RIGHT-LOW-POST' ? currColor : '',
+								'transition-colors duration-300 outline-none border-none'
+							)}
+							on:click={() => handleZoneClicked('RIGHT-LOW-POST')}
+							x="449.59"
+							y="4"
+							width="28.16"
+							height="253.28"
+							on:keydown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									handleZoneClicked('RIGHT-LOW-POST');
+								}
+							}}
+							tabindex="0"
+							role="button"
+							aria-label="Right Low Post Area"
+						/>
+					</g>
+				</svg>
+			</div>
+			<menu class="min-w-[100px]">
+				{#each bPlayers as person}
+					<li>
+						<button
+							type="button"
+							on:click={() => {
+								handlePlayerSelect('b', person);
+							}}
+							class={classNames(
+								selectedPlayer?._id == person._id
+									? 'bg-indigo-700 hover:bg-indigo-800'
+									: ' bg-gray-800 hover:bg-gray-700',
+								'w-full my-2 p-4 items-center border border-transparent rounded-md shadow-sm text-white '
+							)}
+						>
+							{person.name}
+						</button>
+					</li>
+				{/each}
+			</menu>
 		</div>
-		<menu class="min-w-[100px]">
-			{#each bPlayers as person}
-				<li>
-					<button
-						type="button"
-						on:click={() => {
-							handlePlayerSelect('b', person);
-						}}
-						class={classNames(
-							selectedPlayer?._id == person._id
-								? 'bg-indigo-700 hover:bg-indigo-800'
-								: ' bg-gray-800 hover:bg-gray-700',
-							'w-full my-2 p-4 items-center border border-transparent rounded-md shadow-sm text-white '
-						)}
-					>
-						{person.name}
-					</button>
-				</li>
-			{/each}
-		</menu>
-	</div>
+	{/if}
 	<div class=" bg-gray-800 rounded-sm mt-8">
 		<div class="flex justify-evenly items-center shadow-lg">
 			{#if postGame}
