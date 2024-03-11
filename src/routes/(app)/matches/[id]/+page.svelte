@@ -243,6 +243,55 @@
 		</div>
 	</div>
 </Modal>
+
+<Modal title="Assign Teams" bind:openModal>
+	<div slot="content">
+		<div class="overflow-y-auto overflow-x-hidden max-h-80">
+			<ul role="list" class="-my-4 text-sm py-8">
+				{#each players as person}
+					<li class="py-3 px-8 rounded-md">
+						<div class="flex justify-between items-center">
+							{person.name}
+							<div class="flex gap-2">
+								<button
+									on:click={() => handleAddTeam('a', person)}
+									type="button"
+									class={classNames(
+										teamAIds.has(person._id) ? 'bg-green-700' : '',
+										'ring-1 ring-green-700 p-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant '
+									)}
+								>
+									Team A
+								</button>
+								<button
+									on:click={() => handleAddTeam('b', person)}
+									type="button"
+									class={classNames(
+										teamBIds.has(person._id) ? 'bg-green-700' : '',
+										'ring-1 ring-green-700 p-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant '
+									)}
+								>
+									Team B
+								</button>
+							</div>
+						</div>
+					</li>
+				{/each}
+			</ul>
+		</div>
+		<div class="p-6 border-t-[1px] border-slate-700">
+			<button
+				on:click={() => {
+					openModal = false;
+				}}
+				class="p-2 bg-blue-500 w-full rounded-md text-sm disabled:bg-blue-300"
+				type="button"
+			>
+				Dismiss
+			</button>
+		</div>
+	</div>
+</Modal>
 <SlideOver bind:showSidePanel title={`${selectedId ? 'Update' : 'Create New'}  Match`}>
 	<form
 		method="post"
@@ -333,54 +382,6 @@
 						</div>
 					</div>
 				</div>
-				<Modal title="Assign Teams" bind:openModal>
-					<div slot="content">
-						<div class="overflow-y-auto overflow-x-hidden max-h-80">
-							<ul role="list" class="-my-4 text-sm py-8">
-								{#each players as person}
-									<li class="py-3 px-8 rounded-md">
-										<div class="flex justify-between items-center">
-											{person.name}
-											<div class="flex gap-2">
-												<button
-													on:click={() => handleAddTeam('a', person)}
-													type="button"
-													class={classNames(
-														teamAIds.has(person._id) ? 'bg-green-700' : '',
-														'ring-1 ring-green-700 p-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant '
-													)}
-												>
-													Team A
-												</button>
-												<button
-													on:click={() => handleAddTeam('b', person)}
-													type="button"
-													class={classNames(
-														teamBIds.has(person._id) ? 'bg-green-700' : '',
-														'ring-1 ring-green-700 p-4 items-center border border-transparent rounded-sm shadow-sm text-white bg-transparant '
-													)}
-												>
-													Team B
-												</button>
-											</div>
-										</div>
-									</li>
-								{/each}
-							</ul>
-						</div>
-						<div class="p-6 border-t-[1px] border-slate-700">
-							<button
-								on:click={() => {
-									openModal = false;
-								}}
-								class="p-2 bg-blue-500 w-full rounded-md text-sm disabled:bg-blue-300"
-								type="button"
-							>
-								Dismiss
-							</button>
-						</div>
-					</div>
-				</Modal>
 				<div class="text-sm">
 					<h3 class="font-medium">Team A Members</h3>
 					<div class="mt-2">
