@@ -255,11 +255,15 @@
 	$: reversedPoints = [...pointsArr].reverse();
 
 	$: postGame = match?.status == 'archived';
-	let currColor = '';
-	$: {
-		currColor =
-			currTeam == 'a' ? 'fill-red-800' : currTeam == 'b' ? 'fill-blue-800' : 'fill-gray-600';
-	}
+
+	$: currColor =
+		currTeam == 'a' ? 'fill-red-800' : currTeam == 'b' ? 'fill-blue-800' : 'fill-gray-600';
+	$: currColorHover =
+		currTeam == 'a'
+			? 'hover:fill-red-800'
+			: currTeam == 'b'
+			  ? 'hover:fill-blue-800'
+			  : 'hover:fill-gray-600';
 
 	let actions = ['MADE SHOT', 'MISSED SHOT'];
 	// let actions = ['MADE SHOT', 'MISSED SHOT', 'STEAL', 'BLOCK'];
@@ -337,7 +341,7 @@
 				<g id="Layer_1-2" data-name="Layer 1">
 					<rect
 						class={classNames(
-							'hover:' + currColor,
+							currColorHover,
 							currZone == 'RIGHT-ELBOW' ? currColor : '',
 							'transition-colors duration-300 outline-none border-none'
 						)}
@@ -357,7 +361,7 @@
 					/>
 					<rect
 						class={classNames(
-							'hover:' + currColor,
+							currColorHover,
 							currZone == 'LEFT-ELBOW' ? currColor : '',
 							'transition-colors duration-300 outline-none border-none'
 						)}
@@ -377,7 +381,7 @@
 					/>
 					<rect
 						class={classNames(
-							'hover:' + currColor,
+							currColorHover,
 							currZone == 'FREE-THROW' ? currColor : '',
 							'transition-colors duration-300 outline-none border-none'
 						)}
@@ -397,7 +401,7 @@
 					/>
 					<rect
 						class={classNames(
-							'hover:' + currColor,
+							currColorHover,
 							currZone == 'LEFT-CORNER' ? currColor : '',
 							'transition-colors duration-300 outline-none border-none '
 						)}
@@ -417,7 +421,7 @@
 					/>
 					<rect
 						class={classNames(
-							'hover:' + currColor,
+							currColorHover,
 							currZone == 'RIGHT-CORNER' ? currColor : '',
 							'transition-colors duration-300 outline-none border-none '
 						)}
@@ -437,7 +441,7 @@
 					/>
 					<rect
 						class={classNames(
-							'hover:' + currColor,
+							currColorHover,
 							currZone == 'SHORT-LEFT-CORNER' ? currColor : '',
 							'transition-colors duration-300 outline-none border-none '
 						)}
@@ -457,7 +461,7 @@
 					/>
 					<rect
 						class={classNames(
-							'hover:' + currColor,
+							currColorHover,
 							currZone == 'SHORT-RIGHT-CORNER' ? currColor : '',
 							'transition-colors duration-300 outline-none border-none '
 						)}
@@ -477,7 +481,7 @@
 					/>
 					<rect
 						class={classNames(
-							'hover:' + currColor,
+							currColorHover,
 							currZone == 'LEFT-LOW-POST' ? currColor : '',
 							'transition-colors duration-300 outline-none border-none'
 						)}
@@ -497,7 +501,7 @@
 					/>
 					<path
 						class={classNames(
-							'hover:' + currColor,
+							currColorHover,
 							currZone == 'LEFT-WING' ? currColor : '',
 							'transition-colors duration-300 outline-none border-none'
 						)}
@@ -514,7 +518,7 @@
 					/>
 					<path
 						class={classNames(
-							'hover:' + currColor,
+							currColorHover,
 							currZone == 'RIGHT-WING' ? currColor : '',
 							'transition-colors duration-300 outline-none border-none'
 						)}
@@ -531,7 +535,7 @@
 					/>
 					<path
 						class={classNames(
-							'hover:' + currColor,
+							currColorHover,
 							currZone == 'POINT' ? currColor : '',
 							'transition-colors duration-300 outline-none border-none'
 						)}
@@ -548,7 +552,7 @@
 					/>
 					<path
 						class={classNames(
-							'hover:' + currColor,
+							currColorHover,
 							currZone == 'HIGH-POST' ? currColor : '',
 							'transition-colors duration-300 outline-none border-none'
 						)}
@@ -565,7 +569,7 @@
 					/>
 					<rect
 						class={classNames(
-							'hover:' + currColor,
+							currColorHover,
 							currZone == 'PAINT' ? currColor : '',
 							'transition-colors duration-300 outline-none border-none'
 						)}
@@ -585,7 +589,7 @@
 					/>
 					<rect
 						class={classNames(
-							'hover:' + currColor,
+							currColorHover,
 							currZone == 'RIGHT-LOW-POST' ? currColor : '',
 							'transition-colors duration-300 outline-none border-none'
 						)}
