@@ -47,6 +47,7 @@ export interface Action {
 	made: boolean;
 	value?: number;
 	type: string;
+	zone?: string | null;
 }
 
 export interface StatMap {
