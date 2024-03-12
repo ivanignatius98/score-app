@@ -214,12 +214,6 @@
 				action: currAction
 			}
 		];
-		openModal = false;
-		currZone = null;
-		currAction = null;
-		currTeam = '';
-		selectedPlayer = null;
-
 		const { success, record } = await saveAction({
 			match_id: match?._id,
 			action: currAction,
@@ -228,6 +222,11 @@
 		if (success) {
 			history[history.length - 1]._id = record._id;
 		}
+		openModal = false;
+		currZone = null;
+		currAction = null;
+		currTeam = '';
+		selectedPlayer = null;
 	};
 
 	let pointsArr: { a: number; b: number }[] = [];
@@ -275,7 +274,7 @@
 	let currZone: string | null = null;
 
 	const handlePlayerSelect = (team: string, person: Player) => {
-		if (currZone && selectedPlayer?._id != person._id && currTeam == team) {
+		if (currZone && selectedPlayer?._id != person._id) {
 			openModal = true;
 		}
 		currTeam = team;
