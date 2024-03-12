@@ -532,7 +532,6 @@
 						> -->
 
 						<button
-							disabled={true}
 							formaction="?/delete"
 							class="w-full px-4 py-2 text-sm bg-red-800 hover:bg-red-700 rounded-lg text-left disabled:bg-red-300"
 							>Delete</button
