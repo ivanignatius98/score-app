@@ -15,8 +15,6 @@
 				<div class="absolute inset-y-0 right-0 flex max-w-full">
 					<div class="my-auto h-full w-screen max-w-xl pl-20">
 						<div
-							use:clickOutside
-							on:outclick={() => (showSidePanel = false)}
 							bind:clientWidth={width}
 							transition:fly={{ x: width }}
 							class="m-auto flex h-full flex-col bg-gray-900 shadow-xl"
