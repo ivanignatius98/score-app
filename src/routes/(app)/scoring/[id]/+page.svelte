@@ -215,6 +215,11 @@
 			}
 		];
 		openModal = false;
+		currZone = null;
+		currAction = null;
+		currTeam = '';
+		selectedPlayer = null;
+
 		const { success, record } = await saveAction({
 			match_id: match?._id,
 			action: currAction,
