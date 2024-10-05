@@ -20,7 +20,7 @@
 	$: if (queryParams.get('group')) {
 		currGroupId = queryParams.get('group');
 	} else {
-		if (user.groupIds) {
+		if (user.groupIds.length > 0) {
 			currGroupId = user.groupIds[0]._id;
 		} else {
 			currGroupId = user._id;
